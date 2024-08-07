@@ -1,11 +1,12 @@
-from .utils import *
+from pretty_print import *
+from utils import *
 
 
 def report_git_status(
     git_dir, git_name, verbose, all, untracked, modified, check_remote
 ):
 
-    files = git_unpushed_files(git_dir)
+    files = get_unpushed_files(git_dir)
     cur_branch = get_cur_branch(git_dir)
 
     if not cur_branch:

@@ -2,6 +2,35 @@ import os
 import subprocess
 
 
+def pull(git_dir, cur_branch) -> tuple[bool, list[str], str]:
+    pull_output = subprocess.Popen(
+        f"git pull origin {cur_branch}".split(" "),
+        cwd=git_dir,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+
+    output, error = pull_output.communicate()
+    output = output.decode("utf-8").split("\n")
+    error = error.decode("utf-8")
+
+    pulled = []
+    summary = ""
+
+    for idx, line in enumerate(output):
+        if "Fast-forward" in line:
+            for file in output[idx + 1 :]:
+                if any(
+                    text in file for text in ["file changed", "insertions", "deletions"]
+                ):
+                    summary = file
+                    break
+                pulled.append(file)
+            break
+
+    return True, pulled, summary
+
+
 def commits_behind(git_dir: str, cur_branch: str) -> int:
     """Check how many commits you are behind."""
 
@@ -25,7 +54,7 @@ def commits_behind(git_dir: str, cur_branch: str) -> int:
     return int(commits_count[1])
 
 
-def git_unpushed_files(git_dir: str) -> list[str]:
+def get_unpushed_files(git_dir: str) -> list[str]:
     files = subprocess.check_output(
         ["git", "status", "--porcelain"],
         text=True,
