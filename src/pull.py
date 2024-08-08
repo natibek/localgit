@@ -32,14 +32,11 @@ def report_pull(git_dir, git_name, silent, all):
         return 1
 
     # num_behind > 0
-    successful, files, summary = pull(git_dir, cur_branch)
+    successful, files, merged, summary = pull(git_dir, cur_branch)
     if successful:
         # pass_print_text += f"{warning('B')}ehind-> f{warning(str(num_behind))}{success('P')}ulled:{summary}"
         pass_print_text += (
-            summary.replace("changed", warning("changed"))
-            .replace("+", success("+"))
-            .replace("-", failure("-"))
-            .strip()
+            summary.replace("+", success("+")).replace("-", failure("-")).strip()
         )
         print_text = pass_print_text
     else:
@@ -49,7 +46,11 @@ def report_pull(git_dir, git_name, silent, all):
     print(print_text)
 
     if not silent:
+        for merge in merged:
+            print("  - ", merge.replace("Auto-merged", warning("Auto-merged")))
         for file in files:
             print("  -", file.replace("+", success("+")).replace("-", failure("-")))
-    return 1
-    pass
+    return 0
+
+
+# return 1 when merge failed

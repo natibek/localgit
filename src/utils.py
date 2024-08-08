@@ -2,7 +2,8 @@ import os
 import subprocess
 
 
-def pull(git_dir, cur_branch) -> tuple[bool, list[str], str]:
+def pull(git_dir, cur_branch) -> tuple[bool, list[str], list[str], str]:
+    # deal with merge conflict
     pull_output = subprocess.Popen(
         f"git pull origin {cur_branch}".split(" "),
         cwd=git_dir,
@@ -15,10 +16,13 @@ def pull(git_dir, cur_branch) -> tuple[bool, list[str], str]:
     error = error.decode("utf-8")
 
     pulled = []
+    merged = []
     summary = ""
 
     for idx, line in enumerate(output):
-        if "Fast-forward" in line:
+        if line.startswith("Auto-merging"):
+            merged.append(line)
+        elif any(text in line for text in ["Fast-forward", "Merge made by"]):
             for file in output[idx + 1 :]:
                 if any(
                     text in file for text in ["file changed", "insertions", "deletions"]
@@ -28,7 +32,7 @@ def pull(git_dir, cur_branch) -> tuple[bool, list[str], str]:
                 pulled.append(file)
             break
 
-    return True, pulled, summary
+    return True, pulled, merged, summary
 
 
 def commits_behind(git_dir: str, cur_branch: str) -> int:
