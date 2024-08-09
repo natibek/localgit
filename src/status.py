@@ -3,7 +3,7 @@ from utils import *
 
 
 def report_git_status(
-    git_dir, git_name, verbose, all, untracked, modified, check_remote
+    git_dir, git_name, silent, all, untracked, modified, check_remote
 ):
 
     files = get_unpushed_files(git_dir)
@@ -48,7 +48,7 @@ def report_git_status(
 
     print(print_text)
 
-    if verbose:
+    if not silent:
         for file in files:
             if modified and file.startswith("M"):
                 print("  -", file)
