@@ -41,6 +41,12 @@ def add_common_args(subparser):
         default=os.path.expanduser("~"),
         help="The root dir from which github repos should be searched for. ~ by default.",
     )
+    subparser.add_argument(
+        "--silent",
+        "-s",
+        action="store_true",
+        help="Do not print files/folders pulled from remote branch.",
+    )
 
 
 def setup_status_subparser(subparsers: argparse._SubParsersAction, run_status):
@@ -65,12 +71,6 @@ def setup_status_subparser(subparsers: argparse._SubParsersAction, run_status):
         action="store_true",
         help="Whether to also show how many commits a local repo is behind the origin.",
     )
-    status_parser.add_argument(
-        "--verbose",
-        "-v",
-        action="store_true",
-        help="Whether the unpushed files should be shown.",
-    )
 
 
 def setup_push_subparser(subparsers: argparse._SubParsersAction, run_push):
@@ -90,12 +90,6 @@ def setup_push_subparser(subparsers: argparse._SubParsersAction, run_push):
         action="store_true",
         help="Whether to only check for untracked files.",
     )
-    push_parser.add_argument(
-        "--verbose",
-        "-v",
-        action="store_true",
-        help="Whether the unpushed files should be shown.",
-    )
 
 
 def setup_pull_subparser(subparsers: argparse._SubParsersAction, run_pull):
@@ -104,12 +98,6 @@ def setup_pull_subparser(subparsers: argparse._SubParsersAction, run_pull):
     )
     pull_parser.set_defaults(func=run_pull)
     add_common_args(pull_parser)
-    pull_parser.add_argument(
-        "--silent",
-        "-s",
-        action="store_true",
-        help="Do not print files/folders pulled from remote branch.",
-    )
 
 
 def setup_parser(run_push, run_pull, run_status) -> argparse.ArgumentParser:

@@ -23,7 +23,7 @@ def run_status(args, gits):
         exit_code |= report_git_status(
             git_dir,
             git_name,
-            args.verbose,
+            args.silent,
             args.all,
             untracked,
             modified,
