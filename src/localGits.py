@@ -75,7 +75,10 @@ def main():
 
     exclude_dirs = os.environ.get("LOCAL_GITS_EXCLUDE_DIR", "").split(";")
 
-    gits = get_git_dirs(args.root, exclude, exclude_dirs)
+    if git_dirs := args.git_directories:
+        gits = list(zip(get_git_names(git_dirs), git_dirs))
+    else:
+        gits = get_git_dirs(exclude, exclude_dirs)
 
     if len(gits) == 0:
         print("No local github repos found")

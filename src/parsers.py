@@ -3,20 +3,27 @@ import os
 
 
 class readable_dir(argparse.Action):
-    def __call__(self, parser, namespace, values, option_string=None):
-        prospective_dir = values
-        if not os.path.isdir(prospective_dir) or not os.path.isdir(
-            os.path.expanduser(prospective_dir)
-        ):
-            raise argparse.ArgumentTypeError(
-                "readable_dir:{0} is not a valid path".format(prospective_dir)
-            )
-        if os.access(prospective_dir, os.R_OK):
-            setattr(namespace, self.dest, prospective_dir)
-        else:
-            raise argparse.ArgumentTypeError(
-                "readable_dir:{0} is not a readable dir".format(prospective_dir)
-            )
+    def __call__(self, parser, namespace, values: list[str], option_string=None):
+        git_dirs = []
+        for prospective_dir in values:
+            dir_name = os.path.expanduser(prospective_dir)
+            if not os.path.isdir(prospective_dir) or not os.path.isdir(dir_name):
+                raise argparse.ArgumentTypeError(
+                    f"{prospective_dir} is not a valid directory."
+                )
+            if os.access(prospective_dir, os.R_OK):
+                if ".git" in os.listdir(dir_name):
+                    git_dirs.append(prospective_dir)
+                else:
+                    raise argparse.ArgumentTypeError(
+                        f"{prospective_dir} is not a github directory."
+                    )
+            else:
+                raise argparse.ArgumentTypeError(
+                    f"{prospective_dir} is not a readable directory."
+                )
+
+        setattr(namespace, self.dest, git_dirs)
 
 
 def add_common_args(subparser):
@@ -35,11 +42,11 @@ def add_common_args(subparser):
     )
 
     subparser.add_argument(
-        "--root",
-        "-r",
+        "--git-directories",
+        "-g",
+        nargs="*",
         action=readable_dir,
-        default=os.path.expanduser("~"),
-        help="The root dir from which github repos should be searched for. ~ by default.",
+        help="The directories with github repos to affect.",  # root dir from which github repos should be searched for. ~ by default.",
     )
     subparser.add_argument(
         "--silent",

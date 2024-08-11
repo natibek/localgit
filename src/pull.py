@@ -13,18 +13,16 @@ def report_pull(git_dir, git_name, silent, all):
 
     files = get_unpushed_files(git_dir)
 
-    if num_behind == 0:
-        if all:
-            print(
-                f"{git_dir.replace(home_path, '~')}: {success(git_name)}<{cur_branch}>"
-            )
-        return 0
-
     fail_file_display_text = failure(f"{git_name}") + f"<{cur_branch}>{failure('->')} "
-    pass_file_display_text = warning(f"{git_name}") + f"<{cur_branch}>{warning('->')} "
+    pass_file_display_text = success(f"{git_name}") + f"<{cur_branch}>{success('->')} "
 
     fail_print_text = f"{git_dir.replace(home_path, '~')}: {fail_file_display_text}"
     pass_print_text = f"{git_dir.replace(home_path, '~')}: {pass_file_display_text}"
+
+    if num_behind == 0:
+        if all:
+            print(pass_print_text + f"{success('N')}ot Behind")
+        return 0
 
     if num_behind == -1:
         fail_print_text += f"{failure('Remote Branch Deleted')}"
@@ -47,10 +45,15 @@ def report_pull(git_dir, git_name, silent, all):
     print(print_text)
 
     if not silent:
+        if merged:
+            print("  Merged:")
         for merge in merged:
-            print("  - ", merge.replace("Auto-merged", warning("Auto-merged")))
+            print("  - ", merge.replace("Auto-merging", warning("Auto-merging")))
+
         if not successful:
             print(f"  {summary}:")
+        elif files:
+            print(f"  Pulled:")
         for file in files:
             print("  -", file.replace("+", success("+")).replace("-", failure("-")))
 

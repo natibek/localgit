@@ -98,18 +98,20 @@ def get_cur_branch(git_dir):
     return cur_branch
 
 
-def get_git_dirs(
-    home_dir: str, exclude: list[str], exclude_dirs: list[str]
-) -> list[tuple[str, str]]:
-    home_dir = os.path.expanduser(home_dir)
+def get_git_names(git_dirs: list[str]) -> list[str]:
+    return [os.path.basename(git_dir) for git_dir in git_dirs]
+
+
+def get_git_dirs(exclude: list[str], exclude_dirs: list[str]) -> list[tuple[str, str]]:
+    root_dir = os.path.expanduser("~")
     git_dirs = subprocess.check_output(
         ["find", ".", "-name", ".git"],
         text=True,
-        cwd=home_dir,
+        cwd=root_dir,
     ).split("\n")
 
     git_dirs = [
-        os.path.abspath(os.path.dirname(home_dir + git_dir[1:]))
+        os.path.abspath(os.path.dirname(root_dir + git_dir[1:]))
         for git_dir in git_dirs
         if git_dir
     ]
@@ -121,6 +123,6 @@ def get_git_dirs(
         or direc not in git_dir.replace(os.path.expanduser("~"), "~")
         and os.path.basename(git_dir) not in exclude
     ]
+    git_names = get_git_names(git_dirs)
 
-    git_names = [os.path.basename(git_dir) for git_dir in git_dirs]
     return list(zip(git_names, git_dirs))
