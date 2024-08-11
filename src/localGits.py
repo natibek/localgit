@@ -49,7 +49,7 @@ def run_pull(args, gits):
             args.all,
         )
 
-    if exit_code == 0:
+    if exit_code == 0:  # use an enum?
         print(success("All repos are uptodate."))
     else:
         print()

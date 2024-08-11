@@ -32,15 +32,16 @@ def report_pull(git_dir, git_name, silent, all):
         return 1
 
     # num_behind > 0
-    successful, files, merged, summary = pull(git_dir, cur_branch)
+    successful, output, error = call_pull(git_dir, cur_branch)
+    files, merged, summary = handle_pull_output(successful, output, error)
+
     if successful:
-        # pass_print_text += f"{warning('B')}ehind-> f{warning(str(num_behind))}{success('P')}ulled:{summary}"
         pass_print_text += (
             summary.replace("+", success("+")).replace("-", failure("-")).strip()
         )
         print_text = pass_print_text
     else:
-        fail_print_text += f"{failure('B')}ehind:{failure(str(num_behind))}"
+        fail_print_text += f"{failure('A')}borting"
         print_text = fail_print_text
 
     print(print_text)
@@ -48,9 +49,12 @@ def report_pull(git_dir, git_name, silent, all):
     if not silent:
         for merge in merged:
             print("  - ", merge.replace("Auto-merged", warning("Auto-merged")))
+        if not successful:
+            print(f"  {summary}:")
         for file in files:
             print("  -", file.replace("+", success("+")).replace("-", failure("-")))
-    return 0
+
+    return int(not successful)
 
 
 # return 1 when merge failed

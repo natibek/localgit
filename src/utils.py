@@ -2,7 +2,7 @@ import os
 import subprocess
 
 
-def pull(git_dir, cur_branch) -> tuple[bool, list[str], list[str], str]:
+def call_pull(git_dir, cur_branch) -> tuple[bool, str, str]:
     # deal with merge conflict
     pull_output = subprocess.Popen(
         f"git pull origin {cur_branch}".split(" "),
@@ -12,27 +12,48 @@ def pull(git_dir, cur_branch) -> tuple[bool, list[str], list[str], str]:
     )
 
     output, error = pull_output.communicate()
-    output = output.decode("utf-8").split("\n")
+    output = output.decode("utf-8")  # .split("\n")
     error = error.decode("utf-8")
+    # print(output, "output", error)
 
+    print(f"{output=}")
+    print(f"{error=}")
+    return "Aborting" not in error, output, error
+
+
+def handle_pull_output(
+    successful: bool, output: str, error: str
+) -> tuple[list[str], list[str], str]:
     pulled = []
     merged = []
     summary = ""
+    if not successful:
+        error_lst = error.split("\n")
+        for idx, line in enumerate(error_lst):
+            if "overwritten by merge" in line:
+                summary = line.split(":")[1].strip()
+                for file in error_lst[idx + 1 :]:
+                    if "Please commit your changes" in file:
+                        break
+                    pulled.append(file.strip())
+                break
+    else:
+        output_lst = output.split("\n")
+        for idx, line in enumerate(output_lst):
+            if line.startswith("Auto-merging"):
+                merged.append(line)
+            elif any(text in line for text in ["Fast-forward", "Merge made by"]):
+                for file in output_lst[idx + 1 :]:
+                    if any(
+                        text in file
+                        for text in ["file changed", "insertions", "deletions"]
+                    ):
+                        summary = file
+                        break
+                    pulled.append(file)
+                break
 
-    for idx, line in enumerate(output):
-        if line.startswith("Auto-merging"):
-            merged.append(line)
-        elif any(text in line for text in ["Fast-forward", "Merge made by"]):
-            for file in output[idx + 1 :]:
-                if any(
-                    text in file for text in ["file changed", "insertions", "deletions"]
-                ):
-                    summary = file
-                    break
-                pulled.append(file)
-            break
-
-    return True, pulled, merged, summary
+    return pulled, merged, summary
 
 
 def commits_behind(git_dir: str, cur_branch: str) -> int:
