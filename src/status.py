@@ -1,6 +1,7 @@
 from pretty_print import *
 from utils import *
 
+
 def report_git_status(
     git_dir, git_name, silent, all, untracked, modified, check_remote
 ):
