@@ -2,51 +2,55 @@ import os
 import subprocess
 
 
-def call_commit_modified(
-    git_dir: str, cur_branch: str, message: str = "Update"
-) -> tuple[bool, str, str]:
-    commit_output = subprocess.Popen(
+def call_commit_modified(git_dir: str, message: str = "Update") -> str:
+    commit_output = subprocess.check_output(
         f"git commit -am '{message}'".split(" "),
         cwd=git_dir,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-    )
-
-    output, error = commit_output.communicate()
-    output = output.decode("utf-8")  # .split("\n")
-    error = error.decode("utf-8")
-
-    return True, output, error
+        text=True,
+    ).split("\n")
+    return commit_output[1].strip()
 
 
-def call_commit(git_dir: str, cur_branch: str, message: str = "update"):
+def call_commit(git_dir: str, message: str = "update") -> str:
     commit_output = subprocess.check_output(
         f"git commit -m '{message}'".split(" "),
         cwd=git_dir,
         text=True,
-    )
+    ).split("\n")
 
-    return True, output, error
-
-
-def handle_commit_output(successful: bool, output: str, error: str):
-
-    pass
+    return commit_output[1].strip()
 
 
-def call_add_all(git_dir: str, cur_branch: str):
-    add_output = subprocess.check_output(
+def call_add_all(git_dir: str):
+    subprocess.call(
         f"git add -A".split(" "),
         cwd=git_dir,
-        text=True,
     )
 
 
 def call_push(git_dir: str, cur_branch: str) -> bool:
-    push_output = subprocess.check_output(
-        f"git push".split(" "), cwd=git_dir, text=True
+    push_output = subprocess.Popen(
+        "git push".split(" "),
+        cwd=git_dir,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
     )
+    output, error = push_output.communicate()
 
+    print(f"{output=}")
+    print(f"{error=}")
+
+    if "set upstream origin" in error.decode("utf-8"):
+        push_output = subprocess.Popen(
+            f"git push -u origin {cur_branch}".split(" "),
+            cwd=git_dir,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        output, error = push_output.communicate()
+    print()
+    print(f"{output=}")
+    print(f"{error=}")
     return True
 
 

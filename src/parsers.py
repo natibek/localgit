@@ -86,16 +86,18 @@ def setup_push_subparser(subparsers: argparse._SubParsersAction, run_push):
     )
     push_parser.set_defaults(func=run_push)
     add_common_args(push_parser)
-    behind_type = push_parser.add_mutually_exclusive_group()
-    behind_type.add_argument(
-        "--modified",
+    push_parser.add_argument(
+        "--push-all",
+        "-A",
         action="store_true",
-        help="Whether to only check for modified files.",
+        help="Whether to push all the changes (ie including untracked changes.",
     )
-    behind_type.add_argument(
-        "--untracked",
-        action="store_true",
-        help="Whether to only check for untracked files.",
+    push_parser.add_argument(
+        "--message",
+        "-m",
+        type=str,
+        default="update",
+        help="The commit message. (Default 'update')",
     )
 
 

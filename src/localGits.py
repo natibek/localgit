@@ -20,7 +20,7 @@ def run_status(args, gits):
 
     exit_code = 0
     for git_name, git_dir in gits:
-        exit_code |= report_git_status(
+        exit_code |= report_status(
             git_dir,
             git_name,
             args.silent,
@@ -34,13 +34,14 @@ def run_status(args, gits):
         print(success("No repos are behind their origin."))
     elif exit_code == 0:
         print(success("All repos are pushed."))
-    else:
-        print()
+
+    print()
     return exit_code
 
 
-def run_pull(args, gits):
+def run_pull(args, gits) -> int:
     exit_code = 0
+
     for git_name, git_dir in gits:
         exit_code |= report_pull(
             git_dir,
@@ -51,17 +52,24 @@ def run_pull(args, gits):
 
     if exit_code == 0:  # use an enum?
         print(success("All repos are uptodate."))
-    else:
-        print()
+    print()
 
     return exit_code
 
 
-def run_push(args, gits):
-    untracked = (not args.modified and not args.untracked) or args.untracked
-    modified = (not args.untracked and not args.modified) or args.modified
+def run_push(args, gits) -> int:
 
-    print("Push")
+    exit_code = 0
+    print(args.message)
+    for git_name, git_dir in gits:
+        exit_code |= report_push(
+            git_dir, git_name, args.silent, args.all, args.push_all, args.message
+        )
+
+    if exit_code == 0:
+        print(success("All repos are uptodate."))
+    print()
+    return exit_code
 
 
 def main():
@@ -80,6 +88,7 @@ def main():
             git_dir[:-1] if git_dir[-1] == "/" else git_dir for git_dir in git_dirs
         ]
         gits = list(zip(get_git_names(git_dirs), git_dirs))
+        args.all = True
     else:
         gits = get_git_dirs(exclude, exclude_dirs)
 
