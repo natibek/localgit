@@ -96,7 +96,7 @@ def setup_push_subparser(subparsers: argparse._SubParsersAction, run_push):
         "--message",
         "-m",
         type=str,
-        default="update",
+        default="new updates",
         help="The commit message. (Default 'update')",
     )
 

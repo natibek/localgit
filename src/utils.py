@@ -4,7 +4,7 @@ import subprocess
 
 def call_commit_modified(git_dir: str, message: str = "Update") -> str:
     commit_output = subprocess.check_output(
-        f"git commit -am '{message}'".split(" "),
+        ["git", "commit", "-am", message],
         cwd=git_dir,
         text=True,
     ).split("\n")
@@ -13,7 +13,7 @@ def call_commit_modified(git_dir: str, message: str = "Update") -> str:
 
 def call_commit(git_dir: str, message: str = "update") -> str:
     commit_output = subprocess.check_output(
-        f"git commit -m '{message}'".split(" "),
+        ["git", "commit", "-m", message],
         cwd=git_dir,
         text=True,
     ).split("\n")
