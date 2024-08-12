@@ -37,8 +37,8 @@ def call_push(git_dir: str, cur_branch: str) -> bool:
     )
     output, error = push_output.communicate()
 
-    print(f"{output=}")
-    print(f"{error=}")
+    # print(f"{output=}")
+    # print(f"{error=}")
 
     if "set upstream origin" in error.decode("utf-8"):
         push_output = subprocess.Popen(
@@ -48,9 +48,9 @@ def call_push(git_dir: str, cur_branch: str) -> bool:
             stderr=subprocess.PIPE,
         )
         output, error = push_output.communicate()
-    print()
-    print(f"{output=}")
-    print(f"{error=}")
+    # print()
+    # print(f"{output=}")
+    # print(f"{error=}")
     return True
 
 
