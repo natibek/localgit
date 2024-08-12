@@ -2,6 +2,59 @@ import os
 import subprocess
 
 
+def call_commit_modified(
+    git_dir: str, cur_branch: str, message: str = "Update"
+) -> tuple[bool, str, str]:
+    commit_output = subprocess.Popen(
+        f"git commit -am '{message}'".split(" "),
+        cwd=git_dir,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+
+    output, error = commit_output.communicate()
+    output = output.decode("utf-8")  # .split("\n")
+    error = error.decode("utf-8")
+
+    return True, output, error
+
+
+def call_commit(git_dir: str, cur_branch: str, message: str = "update"):
+    commit_output = subprocess.Popen(
+        f"git commit -m '{message}'".split(" "),
+        cwd=git_dir,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+
+    output, error = commit_output.communicate()
+    output = output.decode("utf-8")  # .split("\n")
+    error = error.decode("utf-8")
+
+    return True, output, error
+
+
+def handle_commit_output(successful: bool, output: str, error: str):
+
+    pass
+
+
+def call_add_all(git_dir: str, cur_branch: str):
+    add_output = subprocess.check_output(
+        f"git add -A".split(" "),
+        cwd=git_dir,
+        text=True,
+    )
+
+
+def call_push(git_dir: str, cur_branch: str) -> bool:
+    push_output = subprocess.check_output(
+        f"git push".split(" "), cwd=git_dir, text=True
+    )
+
+    return True
+
+
 def call_pull(git_dir, cur_branch) -> tuple[bool, str, str]:
     # deal with merge conflict
     pull_output = subprocess.Popen(
@@ -16,8 +69,8 @@ def call_pull(git_dir, cur_branch) -> tuple[bool, str, str]:
     error = error.decode("utf-8")
     # print(output, "output", error)
 
-    print(f"{output=}")
-    print(f"{error=}")
+    # print(f"{output=}")
+    # print(f"{error=}")
     return "Aborting" not in error, output, error
 
 

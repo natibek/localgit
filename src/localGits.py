@@ -76,6 +76,9 @@ def main():
     exclude_dirs = os.environ.get("LOCAL_GITS_EXCLUDE_DIR", "").split(";")
 
     if git_dirs := args.git_directories:
+        git_dirs = [
+            git_dir[:-1] if git_dir[-1] == "/" else git_dir for git_dir in git_dirs
+        ]
         gits = list(zip(get_git_names(git_dirs), git_dirs))
     else:
         gits = get_git_dirs(exclude, exclude_dirs)
