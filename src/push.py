@@ -16,7 +16,11 @@ def report_push(
 
     if len(files) == 0:
         if all:
-            print(success(f"{git_name}") + f"<{cur_branch}>")
+            print(
+                f"{git_dir.replace(home_path, '~')}:"
+                + success(f"{git_name}")
+                + f"<{cur_branch}>"
+            )
         return 0
 
     fail_file_display_text = failure(f"{git_name}") + f"<{cur_branch}>{failure('->')} "
