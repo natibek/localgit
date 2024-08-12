@@ -48,9 +48,11 @@ def report_push(
 
     print(print_text)
 
-    if not silent:
-        if successful:
-            for file in files:
-                print("  -", file.replace("+", success("+")).replace("-", failure("-")))
+    if not silent and successful:
+        for file in files:
+            if file.startswith("M"):
+                print("  -", file)
+            if file.startswith("?") and push_all:
+                print("  -", file)
 
     return int(not successful)
