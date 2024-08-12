@@ -20,16 +20,11 @@ def call_commit_modified(
 
 
 def call_commit(git_dir: str, cur_branch: str, message: str = "update"):
-    commit_output = subprocess.Popen(
+    commit_output = subprocess.check_output(
         f"git commit -m '{message}'".split(" "),
         cwd=git_dir,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        text=True,
     )
-
-    output, error = commit_output.communicate()
-    output = output.decode("utf-8")  # .split("\n")
-    error = error.decode("utf-8")
 
     return True, output, error
 
