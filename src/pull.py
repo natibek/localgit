@@ -2,7 +2,7 @@ from pretty_print import *
 from utils import *
 
 
-def report_pull(git_dir, git_name, silent, all):
+def report_pull(git_dir, git_name, silent):
 
     cur_branch = get_cur_branch(git_dir)
     if not cur_branch:
@@ -20,7 +20,7 @@ def report_pull(git_dir, git_name, silent, all):
     pass_print_text = f"{git_dir.replace(home_path, '~')}: {pass_file_display_text}"
 
     if num_behind == 0:
-        if all:
+        if not silent:
             print(pass_print_text + f"{success('N')}ot Behind")
         return 0
 

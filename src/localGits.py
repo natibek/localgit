@@ -24,7 +24,6 @@ def run_status(args, gits):
             git_dir,
             git_name,
             args.silent,
-            args.all,
             untracked,
             modified,
             args.check_remote,
@@ -47,7 +46,6 @@ def run_pull(args, gits) -> int:
             git_dir,
             git_name,
             args.silent,
-            args.all,
         )
 
     if exit_code == 0:  # use an enum?
@@ -62,7 +60,7 @@ def run_push(args, gits) -> int:
     exit_code = 0
     for git_name, git_dir in gits:
         exit_code |= report_push(
-            git_dir, git_name, args.silent, args.all, args.push_all, args.message
+            git_dir, git_name, args.silent, args.push_all, args.message
         )
 
     if exit_code == 0:

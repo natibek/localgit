@@ -2,9 +2,7 @@ from pretty_print import *
 from utils import *
 
 
-def report_status(
-    git_dir, git_name, silent, all, untracked, modified, check_remote
-) -> int:
+def report_status(git_dir, git_name, silent, untracked, modified, check_remote) -> int:
 
     files = get_unpushed_files(git_dir)
     cur_branch = get_cur_branch(git_dir)
@@ -17,7 +15,7 @@ def report_status(
     home_path = os.path.expanduser("~")
 
     if len(files) == 0 and num_behind == 0:
-        if all:
+        if not silent:
             print(
                 f"{git_dir.replace(home_path, '~')}: {success(git_name)}<{cur_branch}>"
             )

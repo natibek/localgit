@@ -35,13 +35,6 @@ def add_common_args(subparser):
         help="The names of the github repos you don't want to check.",
     )
     subparser.add_argument(
-        "--all",
-        "-a",
-        action="store_true",
-        help="Whether to show all the github repos. Default shows ones with unpushed changes.",
-    )
-
-    subparser.add_argument(
         "--git-directories",
         "-g",
         nargs="*",
@@ -52,7 +45,7 @@ def add_common_args(subparser):
         "--silent",
         "-s",
         action="store_true",
-        help="Do not print files/folders pulled from remote branch.",
+        help="Only print repos that are ahead, behind, and/or affected by commands.",
     )
 
 

@@ -3,7 +3,7 @@ from utils import *
 
 
 def report_push(
-    git_dir: str, git_name: str, silent: bool, all: bool, push_all: bool, message: str
+    git_dir: str, git_name: str, silent: bool, push_all: bool, message: str
 ) -> int:
 
     files = get_unpushed_files(git_dir)
@@ -15,7 +15,7 @@ def report_push(
     home_path = os.path.expanduser("~")
 
     if len(files) == 0:
-        if all:
+        if not silent:
             print(
                 f"{git_dir.replace(home_path, '~')} :"
                 + success(f"{git_name}")
