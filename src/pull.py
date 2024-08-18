@@ -70,11 +70,11 @@ def report_pull(git_dir, git_name, silent):
 
             if files:
                 print(f"  Pulled:")
-            for file in files:
-                print("  -", file.replace("+", success("+")).replace("-", failure("-")))
+        for file in files:
+            print("  -", file.replace("+", success("+")).replace("-", failure("-")))
 
-    print(int(bool(not successful and len(failed_merge) > 0)))
-    return int(bool(not successful and len(failed_merge) > 0))
+    print(int(bool(not successful or len(failed_merge) > 0)))
+    return int(bool(not successful or len(failed_merge) > 0))
 
 
 # return 1 when merge failed
