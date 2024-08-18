@@ -17,7 +17,7 @@ def report_push(
     if len(files) == 0:
         if not silent:
             print(
-                f"{git_dir.replace(home_path, '~')} :"
+                f"{git_dir.replace(home_path, '~')}: "
                 + success(f"{git_name}")
                 + f"<{cur_branch}>"
             )
