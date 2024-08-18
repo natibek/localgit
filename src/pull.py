@@ -15,9 +15,15 @@ def report_pull(git_dir, git_name, silent):
 
     fail_file_display_text = failure(f"{git_name}") + f"<{cur_branch}>{failure('->')} "
     pass_file_display_text = success(f"{git_name}") + f"<{cur_branch}>{success('->')} "
+    merge_conflict_display_text = (
+        warning(f"{git_name}") + f"<{cur_branch}>{warning('->')} "
+    )
 
     fail_print_text = f"{git_dir.replace(home_path, '~')}: {fail_file_display_text}"
     pass_print_text = f"{git_dir.replace(home_path, '~')}: {pass_file_display_text}"
+    merge_conflict_print_text = (
+        f"{git_dir.replace(home_path, '~')}: {merge_conflict_display_text}"
+    )
 
     if num_behind == 0:
         if not silent:
@@ -33,13 +39,18 @@ def report_pull(git_dir, git_name, silent):
     successful, output, error = call_pull(git_dir, cur_branch)
     files, merged, failed_merge, summary = handle_pull_output(successful, output, error)
 
+    if failed_merge:
+        text = merge_conflict_print_text
+    else:
+        text = pass_print_text
+
     if successful:
         if summary:
-            pass_print_text += (
+            text += (
                 summary.replace("+", success("+")).replace("-", failure("-")).strip()
             ) + " "
         if failed_merge:
-            pass_print_text += f"{warning('Merge Conflict')}"
+            text += f"{warning('Merge Conflict')}"
         print_text = pass_print_text
     else:
         fail_print_text += f"{failure('Aborting')}"
@@ -48,25 +59,21 @@ def report_pull(git_dir, git_name, silent):
     print(print_text)
 
     if not silent:
-        if failed_merge:
-            print("  Merge conflicts:")
-        for merge in failed_merge:
-            print("  -", merge)
-
-        if merged:
-            print("  Merged:")
-        for merge in merged:
-            print("  - ", merge)
 
         if not successful:
             print(f"  {summary}:")
-        elif files:
-            print(f"  Pulled:")
+        else:
+            for merge in failed_merge:
+                print("  -", merge)
+            for merge in merged:
+                print("  - ", merge)
 
-        for file in files:
-            print("  -", file.replace("+", success("+")).replace("-", failure("-")))
+            if files:
+                print(f"  Pulled:")
+            for file in files:
+                print("  -", file.replace("+", success("+")).replace("-", failure("-")))
 
-    return int(not successful)
+    return int(bool(not successful and failed_merge))
 
 
 # return 1 when merge failed
