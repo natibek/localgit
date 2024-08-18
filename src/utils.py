@@ -1,6 +1,8 @@
 import os
 import subprocess
 
+from pretty_print import *
+
 
 def call_commit_modified(git_dir: str, message: str = "update") -> str:
     """Call `git commit -am ` with a message.
@@ -116,7 +118,7 @@ def call_pull(git_dir, cur_branch) -> tuple[bool, str, str]:
 
 def handle_pull_output(
     successful: bool, output: str, error: str
-) -> tuple[list[str], list[str], str]:
+) -> tuple[list[str], list[str], list[str], str]:
     """Handles the output of `call_pull` to report what files were pull, merged, and failed to
     merge.
 
@@ -126,10 +128,12 @@ def handle_pull_output(
         error: The text in the stderr after `git pull origin ...` was called.
 
     Returns:
-        Tuple reporting whether the files that were pulled, auto merged, and summary of the pull.
+        Tuple reporting whether the files that were pulled, successfully merged, filed to merge,
+        and summary of the pull.
     """
     pulled = []
     merged = []
+    failed_merge = []
     summary = ""
     if not successful:
         error_lst = error.split("\n")
@@ -144,20 +148,34 @@ def handle_pull_output(
     else:
         output_lst = output.split("\n")
         for idx, line in enumerate(output_lst):
+
             if line.startswith("Auto-merging"):
-                merged.append(line)
+                if output_lst[idx + 1].startswith(
+                    "CONFLICT (content): Merge conflict in "
+                ):
+                    message = output_lst[idx + 1].split(": ")[1].strip().split(" ")
+                    message = " ".join(message[0:2]) + ": " + " ".join(message[3:])
+                    failed_merge.append(
+                        message.replace("Merge conflict", failure("Merge conflict"))
+                    )
+                else:
+                    merged.append(
+                        line.replace("Auto-merging", success("Auto-merging") + ":")
+                    )
             elif any(text in line for text in ["Fast-forward", "Merge made by"]):
                 for file in output_lst[idx + 1 :]:
                     if any(
                         text in file
                         for text in ["file changed", "insertions", "deletions"]
                     ):
-                        summary = file
+                        summary = file.replace("+", success("+")).replace(
+                            "-", failure("-")
+                        )
                         break
                     pulled.append(file)
                 break
 
-    return pulled, merged, summary
+    return pulled, merged, failed_merge, summary
 
 
 def commits_behind(git_dir: str, cur_branch: str) -> int:
