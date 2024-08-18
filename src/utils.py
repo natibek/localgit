@@ -109,8 +109,8 @@ def call_pull(git_dir, cur_branch) -> tuple[bool, str, str]:
     error = error.decode("utf-8")
     # print(output, "output", error)
 
-    # print(f"{output=}")
-    # print(f"{error=}")
+    print(f"{output=}")
+    print(f"{error=}")
     return "Aborting" not in error, output, error
 
 
