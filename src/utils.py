@@ -2,7 +2,16 @@ import os
 import subprocess
 
 
-def call_commit_modified(git_dir: str, message: str = "Update") -> str:
+def call_commit_modified(git_dir: str, message: str = "update") -> str:
+    """Call `git commit -am ` with a message.
+
+    Args:
+        git_dir: The github directory where the command will be run.
+        message: The commit message.
+
+    Returns:
+        The text output from the command.
+    """
     commit_output = subprocess.check_output(
         ["git", "commit", "-am", message],
         cwd=git_dir,
@@ -12,6 +21,15 @@ def call_commit_modified(git_dir: str, message: str = "Update") -> str:
 
 
 def call_commit(git_dir: str, message: str = "update") -> str:
+    """Call `git commit -m ` with a message.
+
+    Args:
+        git_dir: The github directory where the command will be run.
+        message: The commit message.
+
+    Returns:
+        The text output from the command.
+    """
     commit_output = subprocess.check_output(
         ["git", "commit", "-m", message],
         cwd=git_dir,
@@ -21,7 +39,12 @@ def call_commit(git_dir: str, message: str = "update") -> str:
     return commit_output[1].strip()
 
 
-def call_add_all(git_dir: str):
+def call_add_all(git_dir: str) -> None:
+    """Call `git add -A`.
+
+    Args:
+        git_dir: The github directory where the command will be run.
+    """
     subprocess.call(
         f"git add -A".split(" "),
         cwd=git_dir,
@@ -29,6 +52,15 @@ def call_add_all(git_dir: str):
 
 
 def call_push(git_dir: str, cur_branch: str) -> bool:
+    """Call `git push` or `git push -u origin cur_branch`.
+
+    Args:
+        git_dir: The github directory where the command will be run.
+        cur_branch: The branch that the user has checkout.
+
+    Returns:
+        Whether the command was successful.
+    """
     push_output = subprocess.Popen(
         "git push".split(" "),
         cwd=git_dir,
@@ -55,6 +87,15 @@ def call_push(git_dir: str, cur_branch: str) -> bool:
 
 
 def call_pull(git_dir, cur_branch) -> tuple[bool, str, str]:
+    """Call `git pull origin cur_branch`.
+
+    Args:
+        git_dir: The github directory where the command will be run.
+        cur_branch: The branch that the user has checkout.
+
+    Returns:
+        Tuple reporting whether the call was successful, the stdout, and stderr.
+    """
     # deal with merge conflict
     pull_output = subprocess.Popen(
         f"git pull origin {cur_branch}".split(" "),
@@ -76,6 +117,17 @@ def call_pull(git_dir, cur_branch) -> tuple[bool, str, str]:
 def handle_pull_output(
     successful: bool, output: str, error: str
 ) -> tuple[list[str], list[str], str]:
+    """Handles the output of `call_pull` to report what files were pull, merged, and failed to
+    merge.
+
+    Args:
+        sucessful: Whether the `git pull origin ...` call was not aborted.
+        output: The text in the stdout after `git pull origin ...` was called.
+        error: The text in the stderr after `git pull origin ...` was called.
+
+    Returns:
+        Tuple reporting whether the files that were pulled, auto merged, and summary of the pull.
+    """
     pulled = []
     merged = []
     summary = ""
@@ -109,7 +161,15 @@ def handle_pull_output(
 
 
 def commits_behind(git_dir: str, cur_branch: str) -> int:
-    """Check how many commits you are behind."""
+    """Check how many commits you are behind the origin.
+
+    Args:
+        git_dir: The github directory where the command will be run.
+        cur_branch: The branch that the user has checkout.
+
+    Returns:
+        The number of commits the local branch is behind the origin.
+    """
 
     fetch = subprocess.Popen(
         f"git fetch origin {cur_branch}".split(" "),
@@ -132,6 +192,14 @@ def commits_behind(git_dir: str, cur_branch: str) -> int:
 
 
 def get_unpushed_files(git_dir: str) -> list[str]:
+    """Gets the files in the local branch that are modified or untracked.
+
+    Args:
+        git_dir: The github directory where the command will be run.
+
+    Returns:
+        The modified files (starting with 'M') and untracked files (starting with '??').
+    """
     files = subprocess.check_output(
         ["git", "status", "--porcelain"],
         text=True,
@@ -141,7 +209,15 @@ def get_unpushed_files(git_dir: str) -> list[str]:
     return [file.strip() for file in files if file]
 
 
-def get_cur_branch(git_dir):
+def get_cur_branch(git_dir) -> str:
+    """Gets the current branch the local repo is checkout into.
+
+    Args:
+        git_dir: The github directory where the command will be run.
+
+    Returns:
+        The name of the current branch.
+    """
     cur_branch = subprocess.check_output(
         ["git", "branch", "--show-current"],
         text=True,
@@ -151,6 +227,7 @@ def get_cur_branch(git_dir):
 
 
 def get_git_names(git_dirs: list[str]) -> list[str]:
+    """Gets the names of the folders containing the local clone of github repositories."""
     return [os.path.basename(git_dir) for git_dir in git_dirs]
 
 
