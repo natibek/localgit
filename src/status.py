@@ -42,7 +42,7 @@ def report_status(git_dir, git_name, silent, untracked, modified, check_remote) 
     if num_behind > 0:
         print_text += f"{failure('B')}ehind:{failure(str(num_behind))}"
     elif num_behind == -1:
-        print_text += f"{failure('Remote Branch Deleted')}"
+        print_text += f"{failure('Remote Branch Not Found')}"
 
     print(print_text)
 

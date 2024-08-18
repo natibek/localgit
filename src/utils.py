@@ -156,7 +156,7 @@ def handle_pull_output(
                     message = output_lst[idx + 1].split(": ")[1].strip().split(" ")
                     message = " ".join(message[0:2]) + ": " + " ".join(message[3:])
                     failed_merge.append(
-                        message.replace("Merge conflict", failure("Merge conflict"))
+                        message.replace("Merge conflict", warning("Merge conflict"))
                     )
                 else:
                     merged.append(

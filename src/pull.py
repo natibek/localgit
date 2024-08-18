@@ -25,7 +25,7 @@ def report_pull(git_dir, git_name, silent):
         return 0
 
     if num_behind == -1:
-        fail_print_text += f"{failure('Remote Branch Deleted')}"
+        fail_print_text += f"{failure('Remote Branch Not Found')}"
         print(fail_print_text)
         return 1
 
@@ -34,12 +34,15 @@ def report_pull(git_dir, git_name, silent):
     files, merged, failed_merge, summary = handle_pull_output(successful, output, error)
 
     if successful:
-        pass_print_text += (
-            summary.replace("+", success("+")).replace("-", failure("-")).strip()
-        )
+        if summary:
+            pass_print_text += (
+                summary.replace("+", success("+")).replace("-", failure("-")).strip()
+            ) + " "
+        if failed_merge:
+            pass_print_text += f"{warning('Merge Conflict')}"
         print_text = pass_print_text
     else:
-        fail_print_text += f"{failure('A')}borting"
+        fail_print_text += f"{failure('Aborting')}"
         print_text = fail_print_text
 
     print(print_text)
