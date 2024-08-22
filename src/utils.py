@@ -88,7 +88,7 @@ def call_push(git_dir: str, cur_branch: str) -> bool:
     return True
 
 
-def call_pull(git_dir, cur_branch) -> tuple[bool, str, str]:
+def call_pull(git_dir, cur_branch) -> tuple[str, str]:
     """Call `git pull origin cur_branch`.
 
     Args:
@@ -96,7 +96,7 @@ def call_pull(git_dir, cur_branch) -> tuple[bool, str, str]:
         cur_branch: The branch that the user has checkout.
 
     Returns:
-        Tuple reporting whether the call was successful, the stdout, and stderr.
+        Tuple reporting whether the stdout, and stderr.
     """
     # deal with merge conflict
     pull_output = subprocess.Popen(
@@ -112,38 +112,42 @@ def call_pull(git_dir, cur_branch) -> tuple[bool, str, str]:
 
     # print(f"{output=}")
     # print(f"{error=}")
-    return "Aborting" not in error, output, error
+    return output, error
 
 
 def handle_pull_output(
-    successful: bool, output: str, error: str
-) -> tuple[list[str], list[str], list[str], str]:
+    output: str, error: str
+) -> tuple[bool, list[str], list[str], list[str], str]:
     """Handles the output of `call_pull` to report what files were pull, merged, and failed to
     merge.
 
     Args:
-        sucessful: Whether the `git pull origin ...` call was not aborted.
         output: The text in the stdout after `git pull origin ...` was called.
         error: The text in the stderr after `git pull origin ...` was called.
 
     Returns:
-        Tuple reporting whether the files that were pulled, successfully merged, filed to merge,
-        and summary of the pull.
+        Tuple reporting whether the call was successful, the files that were pulled,
+        successfully merged, filed to merge, and summary of the pull.
     """
     pulled = []
     merged = []
     failed_merge = []
     summary = ""
-    if not successful:
+    successful = True
+    if "Aborting" in error:
+        successful = False
         error_lst = error.split("\n")
         for idx, line in enumerate(error_lst):
             if "overwritten by merge" in line:
-                summary = line.split(":")[1].strip()
+                summary = line.split(":")[1].strip() + ": "
                 for file in error_lst[idx + 1 :]:
                     if "Please commit your changes" in file:
                         break
                     pulled.append(file.strip())
                 break
+    elif "fatal: Exiting because of an unresolved conflict" in error:
+        successful = False
+        summary = failure("Unresolved Conflict")
     else:
         output_lst = output.split("\n")
         for idx, line in enumerate(output_lst):
@@ -174,7 +178,7 @@ def handle_pull_output(
                     pulled.append(file)
                 break
 
-    return pulled, merged, failed_merge, summary
+    return successful, pulled, merged, failed_merge, summary
 
 
 def commits_behind(git_dir: str, cur_branch: str) -> int:

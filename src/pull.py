@@ -27,7 +27,9 @@ def report_pull(git_dir, git_name, silent):
 
     if num_behind == 0:
         if not silent:
-            print(pass_print_text + f"{success('N')}ot Behind")
+            print(
+                f"{git_dir.replace(home_path, '~')}: {success(git_name)}<{cur_branch}>"
+            )
         return 0
 
     if num_behind == -1:
@@ -36,8 +38,8 @@ def report_pull(git_dir, git_name, silent):
         return 1
 
     # num_behind > 0
-    successful, output, error = call_pull(git_dir, cur_branch)
-    files, merged, failed_merge, summary = handle_pull_output(successful, output, error)
+    output, error = call_pull(git_dir, cur_branch)
+    successful, files, merged, failed_merge, summary = handle_pull_output(output, error)
 
     if len(failed_merge) > 0:
         text = merge_conflict_print_text
@@ -50,10 +52,10 @@ def report_pull(git_dir, git_name, silent):
                 summary.replace("+", success("+")).replace("-", failure("-")).strip()
             ) + " "
         if failed_merge:
-            text += f"{warning('Merge Conflict')}"
+            text += warning("Merge Conflict")
         print_text = pass_print_text
     else:
-        fail_print_text += f"{failure('Aborting')}"
+        fail_print_text += failure("Error")
         print_text = fail_print_text
 
     print(print_text)
@@ -61,7 +63,7 @@ def report_pull(git_dir, git_name, silent):
     if not silent:
 
         if not successful:
-            print(f"  {summary}:")
+            print(f"  {summary}")
         else:
             for merge in failed_merge:
                 print("  -", merge)
@@ -73,7 +75,6 @@ def report_pull(git_dir, git_name, silent):
         for file in files:
             print("  -", file.replace("+", success("+")).replace("-", failure("-")))
 
-    print(int(bool(not successful or len(failed_merge) > 0)))
     return int(bool(not successful or len(failed_merge) > 0))
 
 
