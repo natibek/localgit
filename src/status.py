@@ -2,7 +2,15 @@ from pretty_print import *
 from utils import *
 
 
-def report_status(git_dir, git_name, silent, untracked, modified, check_remote) -> int:
+def report_status(
+    git_dir: str,
+    git_name: str,
+    silent: bool,
+    untracked: bool,
+    modified: bool,
+    check_remote: bool,
+    check_ahead: bool,
+) -> int:
 
     files = get_unpushed_files(git_dir)
     cur_branch = get_cur_branch(git_dir)
@@ -11,10 +19,11 @@ def report_status(git_dir, git_name, silent, untracked, modified, check_remote) 
         return 0
 
     num_behind = commits_behind(git_dir, cur_branch) if check_remote else 0
+    num_ahead = commits_ahead(git_dir, cur_branch) if check_remote else 0
 
     home_path = os.path.expanduser("~")
 
-    if len(files) == 0 and num_behind == 0:
+    if len(files) == 0 and num_behind == 0 and num_ahead == 0:
         if not silent:
             print(
                 f"{git_dir.replace(home_path, '~')}: {success(git_name)}<{cur_branch}>"
@@ -27,6 +36,8 @@ def report_status(git_dir, git_name, silent, untracked, modified, check_remote) 
     if (
         (modified_count and modified)
         or (untracked_count and untracked)
+        or num_ahead > 0
+        or num_ahead == -1
         or num_behind > 0
         or num_behind == -1
     ):
@@ -39,10 +50,14 @@ def report_status(git_dir, git_name, silent, untracked, modified, check_remote) 
         print_text += f"{failure('M')}odified:{failure(str(modified_count))} "
     if untracked_count > 0 and untracked:
         print_text += f"{failure('U')}ntracked:{failure(str(untracked_count))} "
-    if num_behind > 0:
-        print_text += f"{failure('B')}ehind:{failure(str(num_behind))}"
-    elif num_behind == -1:
+
+    if num_behind == -1 or num_ahead == -1:
         print_text += f"{failure('Remote Branch Not Found')}"
+    else:
+        if num_ahead > 0:
+            print_text += f"{failure('A')}ahead:{failure(str(num_ahead))} "
+        if num_behind > 0:
+            print_text += f"{failure('B')}ehind:{failure(str(num_behind))}"
 
     print(print_text)
 

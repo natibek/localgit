@@ -2,7 +2,7 @@ from pretty_print import *
 from utils import *
 
 
-def report_pull(git_dir, git_name, silent):
+def report_pull(git_dir: str, git_name: str, silent: bool) -> int:
 
     cur_branch = get_cur_branch(git_dir)
     if not cur_branch:

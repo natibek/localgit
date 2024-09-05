@@ -3,6 +3,10 @@ import os
 
 
 class readable_dir(argparse.Action):
+    """From stackoverflow and modified
+    https://stackoverflow.com/questions/11415570/directory-path-types-with-argparse
+    """
+
     def __call__(self, parser, namespace, values: list[str], option_string=None):
         git_dirs = []
         for prospective_dir in values:
@@ -27,19 +31,27 @@ class readable_dir(argparse.Action):
 
 
 def add_common_args(subparser):
+    """Adds all the common arguments that status, pull, and push have to their respective
+    parsers.
+
+    Args:
+        subparser: The subparser belonging to status, pull, or push.
+
+    """
+    subparser.add_argument(
+        #       "--git-directories",
+        #       "-g",
+        "repo_directories",
+        nargs="*",
+        action=readable_dir,
+        help="The directories with github repos to affect.",  # root dir from which github repos should be searched for. ~ by default.",
+    )
     subparser.add_argument(
         "--exclude",
         "-x",
         type=str,
         nargs="*",
         help="The names of the github repos you don't want to check.",
-    )
-    subparser.add_argument(
-        "--git-directories",
-        "-g",
-        nargs="*",
-        action=readable_dir,
-        help="The directories with github repos to affect.",  # root dir from which github repos should be searched for. ~ by default.",
     )
     subparser.add_argument(
         "--silent",
@@ -50,8 +62,10 @@ def add_common_args(subparser):
 
 
 def setup_status_subparser(subparsers: argparse._SubParsersAction, run_status):
+    """Setups up the status subparser with the common arguments and status specific arguments
+    including --modified, --untracked, --check-remote, --check-ahead."""
     status_parser = subparsers.add_parser(
-        "status", help="Show the status of all the local repos."
+        "status", help="Show the status of local repos."
     )
     add_common_args(status_parser)
     status_parser.set_defaults(func=run_status)
@@ -70,6 +84,11 @@ def setup_status_subparser(subparsers: argparse._SubParsersAction, run_status):
         "--check-remote",
         action="store_true",
         help="Whether to also show how many commits a local repo is behind the origin.",
+    )
+    behind_type.add_argument(
+        "--check-ahead",
+        action="store_true",
+        help="Whether to also show how many commits a local repo is ahead of the origin.",
     )
 
 

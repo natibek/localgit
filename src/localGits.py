@@ -9,14 +9,16 @@ from push import *
 from status import *
 
 
-def run_status(args, gits):
-    untracked = (
-        not args.modified and not args.untracked and not args.check_remote
-    ) or (args.untracked)
-
-    modified = (
-        not args.untracked and not args.modified and not args.check_remote
-    ) or args.modified
+def run_status(args, gits: list[tuple[str, str]]):
+    all_tags_false = (
+        not args.modified
+        and not args.untracked
+        and not args.check_remote
+        and not args.check_ahead
+    )
+    untracked = all_tags_false or (args.untracked)
+    modified = all_tags_false or args.modified
+    check_ahead = all_tags_false or args.check_ahead
 
     exit_code = 0
     for git_name, git_dir in gits:
@@ -27,6 +29,7 @@ def run_status(args, gits):
             untracked,
             modified,
             args.check_remote,
+            check_ahead,
         )
 
     if exit_code == 0 and args.check_remote:
@@ -38,7 +41,7 @@ def run_status(args, gits):
     return exit_code
 
 
-def run_pull(args, gits) -> int:
+def run_pull(args, gits: list[tuple[str, str]]) -> int:
     exit_code = 0
 
     for git_name, git_dir in gits:
@@ -55,7 +58,7 @@ def run_pull(args, gits) -> int:
     return exit_code
 
 
-def run_push(args, gits) -> int:
+def run_push(args, gits: list[tuple[str, str]]) -> int:
 
     exit_code = 0
     for git_name, git_dir in gits:
@@ -80,7 +83,7 @@ def main():
 
     exclude_dirs = os.environ.get("LOCAL_GITS_EXCLUDE_DIR", "").split(";")
 
-    if git_dirs := args.git_directories:
+    if git_dirs := args.repo_directories:
         git_dirs = [
             git_dir[:-1] if git_dir[-1] == "/" else git_dir for git_dir in git_dirs
         ]
