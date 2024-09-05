@@ -8,6 +8,8 @@ def report_push(
 
     files = get_unpushed_files(git_dir)
     cur_branch = get_cur_branch(git_dir)
+    num_commits_ahead = commits_ahead(git_dir, cur_branch)
+    print(num_commits_ahead)
 
     if not cur_branch:
         return 0

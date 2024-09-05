@@ -181,6 +181,26 @@ def handle_pull_output(
     return successful, pulled, merged, failed_merge, summary
 
 
+def commits_ahead(git_dir: str, cur_branch: str) -> int:
+    """Check how many commits you are ahead of the origin.
+
+    Args:
+        git_dir: The github directory where the command will be run.
+        cur_branch: The branch that the user has checkout.
+
+    Returns:
+        The number of commits the local branch is behind the origin.
+    """
+    commits_count = subprocess.check_output(
+        f"git rev-list --left-right --count {cur_branch}...origin/{cur_branch}".split(
+            " "
+        ),
+        text=True,
+        cwd=git_dir,
+    )[:-1].split("\t")
+    return int(commits_count[0])
+
+
 def commits_behind(git_dir: str, cur_branch: str) -> int:
     """Check how many commits you are behind the origin.
 
