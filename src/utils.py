@@ -98,7 +98,6 @@ def call_pull(git_dir, cur_branch) -> tuple[str, str]:
     Returns:
         Tuple reporting whether the stdout, and stderr.
     """
-    # deal with merge conflict
     pull_output = subprocess.Popen(
         f"git pull origin {cur_branch}".split(" "),
         cwd=git_dir,
@@ -134,7 +133,8 @@ def handle_pull_output(
     failed_merge = []
     summary = ""
     successful = True
-    if "Aborting" in error:
+
+    if "Aborting" in error:  # git pull aborted because commits haven't been pushed
         successful = False
         error_lst = error.split("\n")
         for idx, line in enumerate(error_lst):
@@ -145,14 +145,14 @@ def handle_pull_output(
                         break
                     pulled.append(file.strip())
                 break
-    elif "fatal: Exiting because of an unresolved conflict" in error:
+    elif "fatal: Exiting because of an unresolved conflict" in error:  # merge conflict
         successful = False
         summary = failure("Unresolved Conflict")
     else:
         output_lst = output.split("\n")
         for idx, line in enumerate(output_lst):
 
-            if line.startswith("Auto-merging"):
+            if line.startswith("Auto-merging"):  # Merge conflict exists
                 if output_lst[idx + 1].startswith(
                     "CONFLICT (content): Merge conflict in "
                 ):
@@ -166,10 +166,12 @@ def handle_pull_output(
                         line.replace("Auto-merging", success("Auto-merging") + ":")
                     )
             elif any(text in line for text in ["Fast-forward", "Merge made by"]):
+                # No conflicts
                 for file in output_lst[idx + 1 :]:
+                    print(file)
                     if any(
                         text in file
-                        for text in ["file changed", "insertions", "deletions"]
+                        for text in ["file changed", "insertion", "deletion"]
                     ):
                         summary = file.replace("+", success("+")).replace(
                             "-", failure("-")
@@ -269,9 +271,9 @@ def get_git_dirs(exclude: list[str], exclude_dirs: list[str]) -> list[tuple[str,
     git_dirs = [
         git_dir
         for git_dir in all_git_dirs
-        if not any(
+        if os.path.basename(git_dir) not in exclude
+        and not any(
             direc in git_dir.replace(os.path.expanduser("~"), "~")
-            or os.path.basename(git_dir) in exclude
             for direc in exclude_dirs
         )
     ]
