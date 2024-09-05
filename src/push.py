@@ -24,6 +24,9 @@ def report_push(
             )
         return 0
     elif len(files) > 0:
+        pass_file_display_text = (
+            success(f"{git_name}") + f"<{cur_branch}>{success('->')} "
+        )
         if push_all:
             call_add_all(git_dir)
             commit_output = call_commit(git_dir, message)
@@ -32,12 +35,12 @@ def report_push(
     elif num_commits_ahead > 0:
         # cases like merges from other branch into local branch.
         # No file is shown as modified or untracked but there are commits that have not been pushed
+        pass_file_display_text = success(f"{git_name}") + f"<{cur_branch}> "
         commit_output = ""
 
     successful = call_push(git_dir, cur_branch)
 
     fail_file_display_text = failure(f"{git_name}") + f"<{cur_branch}>{failure('->')} "
-    pass_file_display_text = success(f"{git_name}") + f"<{cur_branch}>{success('->')} "
 
     fail_print_text = f"{git_dir.replace(home_path, '~')}: {fail_file_display_text}"
     pass_print_text = f"{git_dir.replace(home_path, '~')}: {pass_file_display_text}"
