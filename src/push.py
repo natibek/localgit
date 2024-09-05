@@ -9,14 +9,13 @@ def report_push(
     files = get_unpushed_files(git_dir)
     cur_branch = get_cur_branch(git_dir)
     num_commits_ahead = commits_ahead(git_dir, cur_branch)
-    print(num_commits_ahead)
 
     if not cur_branch:
         return 0
 
     home_path = os.path.expanduser("~")
 
-    if len(files) == 0:
+    if len(files) == 0 and num_commits_ahead == 0:
         if not silent:
             print(
                 f"{git_dir.replace(home_path, '~')}: "
@@ -24,6 +23,18 @@ def report_push(
                 + f"<{cur_branch}>"
             )
         return 0
+    elif len(files) > 0:
+        if push_all:
+            call_add_all(git_dir)
+            commit_output = call_commit(git_dir, message)
+        else:
+            commit_output = call_commit_modified(git_dir, message)
+    elif num_commits_ahead > 0:
+        # cases like merges from other branch into local branch.
+        # No file is shown as modified or untracked but there are commits that have not been pushed
+        commit_output = ""
+
+    successful = call_push(git_dir, cur_branch)
 
     fail_file_display_text = failure(f"{git_name}") + f"<{cur_branch}>{failure('->')} "
     pass_file_display_text = success(f"{git_name}") + f"<{cur_branch}>{success('->')} "
@@ -31,18 +42,13 @@ def report_push(
     fail_print_text = f"{git_dir.replace(home_path, '~')}: {fail_file_display_text}"
     pass_print_text = f"{git_dir.replace(home_path, '~')}: {pass_file_display_text}"
 
-    if push_all:
-        call_add_all(git_dir)
-        commit_output = call_commit(git_dir, message)
-    else:
-        commit_output = call_commit_modified(git_dir, message)
-
-    successful = call_push(git_dir, cur_branch)
-
     if successful:
-        pass_print_text += (
-            commit_output.replace("+", success("+")).replace("-", failure("-")).strip()
-        )
+        if commit_output:
+            pass_print_text += (
+                commit_output.replace("+", success("+"))
+                .replace("-", failure("-"))
+                .strip()
+            )
         print_text = pass_print_text
     else:
         fail_print_text += f"{failure('A')}borting"
