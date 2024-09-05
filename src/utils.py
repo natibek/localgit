@@ -82,7 +82,6 @@ def call_push(git_dir: str, cur_branch: str) -> bool:
             stderr=subprocess.PIPE,
         )
         output, error = push_output.communicate()
-    # print()
     # print(f"{output=}")
     # print(f"{error=}")
     return True

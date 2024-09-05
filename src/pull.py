@@ -37,14 +37,10 @@ def report_pull(git_dir, git_name, silent):
         print(fail_print_text)
         return 1
 
-    # num_behind > 0
     output, error = call_pull(git_dir, cur_branch)
     successful, files, merged, failed_merge, summary = handle_pull_output(output, error)
 
-    if len(failed_merge) > 0:
-        text = merge_conflict_print_text
-    else:
-        text = pass_print_text
+    text = merge_conflict_print_text if len(failed_merge) > 0 else pass_print_text
 
     if successful:
         if len(summary) > 0:
