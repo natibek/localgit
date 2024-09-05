@@ -266,19 +266,15 @@ def get_git_dirs(exclude: list[str], exclude_dirs: list[str]) -> list[tuple[str,
         if git_dir
     ]
 
-    git_dirs = []
-    for git_dir in all_git_dirs:
-        include = True
-        for direc in exclude_dirs:
-            if (
-                direc in git_dir.replace(os.path.expanduser("~"), "~")
-                or os.path.basename(git_dir) in exclude
-            ):
-                include = False
-                break
-
-        if include:
-            git_dirs.append(git_dir)
+    git_dirs = [
+        git_dir
+        for git_dir in all_git_dirs
+        if not any(
+            direc in git_dir.replace(os.path.expanduser("~"), "~")
+            or os.path.basename(git_dir) in exclude
+            for direc in exclude_dirs
+        )
+    ]
 
     git_names = get_git_names(git_dirs)
 
