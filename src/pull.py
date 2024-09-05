@@ -47,18 +47,14 @@ def report_pull(git_dir, git_name, silent):
         text = pass_print_text
 
     if successful:
-        if summary:
-            text += (
-                summary.replace("+", success("+")).replace("-", failure("-")).strip()
-            ) + " "
-        if failed_merge:
+        if len(summary) > 0:
+            text += summary + " "
+        if len(failed_merge) > 0:
             text += warning("Merge Conflict")
-        print_text = pass_print_text
     else:
         fail_print_text += failure("Error")
-        print_text = fail_print_text
 
-    print(print_text)
+    print(text)
 
     if not silent:
 

@@ -168,7 +168,6 @@ def handle_pull_output(
             elif any(text in line for text in ["Fast-forward", "Merge made by"]):
                 # No conflicts
                 for file in output_lst[idx + 1 :]:
-                    print(file)
                     if any(
                         text in file
                         for text in ["file changed", "insertion", "deletion"]
