@@ -19,7 +19,7 @@ def report_status(
         return 0
 
     num_behind = commits_behind(git_dir, cur_branch) if check_remote else 0
-    num_ahead = commits_ahead(git_dir, cur_branch) if check_remote else 0
+    num_ahead = commits_ahead(git_dir, cur_branch) if not check_remote else 0
 
     home_path = os.path.expanduser("~")
 
@@ -55,7 +55,7 @@ def report_status(
         print_text += f"{failure('Remote Branch Not Found')}"
     else:
         if num_ahead > 0:
-            print_text += f"{failure('A')}ahead:{failure(str(num_ahead))} "
+            print_text += f"{failure('A')}head:{failure(str(num_ahead))} "
         if num_behind > 0:
             print_text += f"{failure('B')}ehind:{failure(str(num_behind))}"
 
