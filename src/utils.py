@@ -1,7 +1,7 @@
 import os
 import subprocess
 
-from pretty_print import *
+from pretty_print import failure, success
 
 
 def call_commit_modified(git_dir: str, message: str = "update") -> str:

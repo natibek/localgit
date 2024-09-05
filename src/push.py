@@ -1,5 +1,15 @@
-from pretty_print import *
-from utils import *
+import os
+
+from pretty_print import failure, success
+from utils import (
+    call_add_all,
+    call_commit,
+    call_commit_modified,
+    call_push,
+    commits_ahead,
+    get_cur_branch,
+    get_unpushed_files,
+)
 
 
 def report_push(

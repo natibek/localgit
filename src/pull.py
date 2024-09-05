@@ -1,5 +1,13 @@
-from pretty_print import *
-from utils import *
+import os
+
+from pretty_print import failure, success, warning
+from utils import (
+    call_pull,
+    commits_behind,
+    get_cur_branch,
+    get_unpushed_files,
+    handle_pull_output,
+)
 
 
 def report_pull(git_dir: str, git_name: str, silent: bool) -> int:

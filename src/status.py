@@ -1,5 +1,7 @@
-from pretty_print import *
-from utils import *
+import os
+
+from pretty_print import failure, success
+from utils import commits_ahead, commits_behind, get_cur_branch, get_unpushed_files
 
 
 def report_status(

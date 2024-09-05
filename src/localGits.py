@@ -3,10 +3,11 @@
 import os
 
 from parsers import setup_parser
-from pretty_print import *
-from pull import *
-from push import *
-from status import *
+from pretty_print import success
+from pull import report_pull
+from push import report_push
+from status import report_status
+from utils import get_git_dirs, get_git_names
 
 
 def run_status(args, gits: list[tuple[str, str]]):
