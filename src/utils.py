@@ -1,4 +1,4 @@
-import os
+import os.path
 import subprocess
 
 from pretty_print import failure, success

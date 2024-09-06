@@ -1,4 +1,4 @@
-import os
+import os.path
 
 from pretty_print import success
 from utils import get_commit_logs, get_cur_branch

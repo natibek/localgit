@@ -1,4 +1,4 @@
-import os
+import os.path
 
 from pretty_print import failure, success
 from utils import commits_ahead, commits_behind, get_cur_branch, get_unpushed_files

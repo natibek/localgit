@@ -1,5 +1,5 @@
 import argparse
-import os
+import os.path
 
 
 class readable_dir(argparse.Action):

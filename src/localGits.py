@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import os
+import os.path
 
 from log import report_log
 from parsers import setup_parser
