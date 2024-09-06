@@ -1,8 +1,31 @@
 import os
 import subprocess
-from types import coroutine
 
 from pretty_print import failure, success
+
+
+def get_commit_logs(git_dir: str, num_logs: int) -> list[str]:
+    """Get the last min(`num_logs`, number of commit logs) logs of a github repository.
+
+    Args:
+        git_dir: The github directory where the
+        num_logs: Maximum number of logs to get from the repositories.
+
+    Returns a list of the last `num_logs`  logs.
+    """
+    logs_output = subprocess.Popen(
+        ["git", "log", "--oneline"],
+        cwd=git_dir,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    output, error = logs_output.communicate()
+
+    if error.decode("utf-8"):
+        return []
+    # print(error.decode("utf-8"))
+    logs = output.decode("utf-8").split("\n")
+    return logs[: min(len(logs), num_logs)]
 
 
 def call_commit_modified(git_dir: str, message: str = "update") -> str:
@@ -70,7 +93,7 @@ def call_push(git_dir: str, cur_branch: str) -> bool:
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
     )
-    output, error = push_output.communicate()
+    _, error = push_output.communicate()
 
     # print(f"{output=}")
     # print(f"{error=}")
@@ -280,11 +303,26 @@ def get_cur_branch(git_dir) -> str:
 
 
 def get_git_names(git_dirs: list[str]) -> list[str]:
-    """Gets the names of the folders containing the local clone of github repositories."""
+    """Gets the names of the folders containing the local clone of github repositories.
+
+    Args:
+        git_dirs: List of the valid directories containing github repositories.
+
+    Returns a list of the folder names containing the github repositories.
+    """
     return [os.path.basename(git_dir) for git_dir in git_dirs]
 
 
 def get_git_dirs(exclude: list[str], exclude_dirs: list[str]) -> list[tuple[str, str]]:
+    """Gets the directories and foldernames containing the local clone of the github
+    repositories.
+
+    Args:
+        exclude: List of the github repo names to exclude.
+        exclude_dirs: List of the directories containing github repositories to ignore.
+
+    Returns a list of pairs of folder names and directories of where the repositories are.
+    """
     root_dir = os.path.expanduser("~")
     git_dirs = subprocess.check_output(
         ["find", ".", "-name", ".git"],

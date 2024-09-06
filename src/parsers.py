@@ -93,6 +93,8 @@ def setup_status_subparser(subparsers: argparse._SubParsersAction, run_status):
 
 
 def setup_push_subparser(subparsers: argparse._SubParsersAction, run_push):
+    """Setups up the push subparser with the common arguments and status specific arguments
+    including --push-all, --message."""
     push_parser = subparsers.add_parser(
         "push", help="Push all the commited changes in the local repos."
     )
@@ -114,6 +116,7 @@ def setup_push_subparser(subparsers: argparse._SubParsersAction, run_push):
 
 
 def setup_pull_subparser(subparsers: argparse._SubParsersAction, run_pull):
+    """Setups up the pull subparser with the common arguments."""
     pull_parser = subparsers.add_parser(
         "pull", help="Pull from origin for all local repos that are behind."
     )
@@ -121,7 +124,37 @@ def setup_pull_subparser(subparsers: argparse._SubParsersAction, run_pull):
     add_common_args(pull_parser)
 
 
-def setup_parser(run_push, run_pull, run_status) -> argparse.ArgumentParser:
+def setup_log_subparser(subparsers: argparse._SubParsersAction, run_pull):
+    """Setups up the log subparser with the common arguments and"""
+    log_parser = subparsers.add_parser(
+        "log", help="Get the last n oneline commit logs of local repositories."
+    )
+    log_parser.add_argument(
+        #       "--git-directories",
+        #       "-g",
+        "repo_directories",
+        nargs="*",
+        action=readable_dir,
+        help="The directories with github repos to affect.",  # root dir from which github repos should be searched for. ~ by default.",
+    )
+    log_parser.add_argument(
+        "--exclude",
+        "-x",
+        type=str,
+        nargs="*",
+        help="The names of the github repos you don't want to check.",
+    )
+    log_parser.add_argument(
+        "--num-logs",
+        "-n",
+        type=int,
+        default=3,
+        help="The number of logs to show for each local repo. Maximum is 10. Default if 3.",
+    )
+    log_parser.set_defaults(func=run_pull)
+
+
+def setup_parser(run_push, run_pull, run_status, run_log) -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="local_gits",
         description="local_gits helps manage all the local git repos.",
@@ -135,5 +168,6 @@ def setup_parser(run_push, run_pull, run_status) -> argparse.ArgumentParser:
     setup_status_subparser(subparsers, run_status)
     setup_pull_subparser(subparsers, run_pull)
     setup_push_subparser(subparsers, run_push)
+    setup_log_subparser(subparsers, run_log)
 
     return parser

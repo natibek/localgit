@@ -2,12 +2,24 @@
 
 import os
 
+from log import report_log
 from parsers import setup_parser
 from pretty_print import success
 from pull import report_pull
 from push import report_push
 from status import report_status
 from utils import get_git_dirs, get_git_names
+
+
+def run_log(args, gits: list[tuple[str, str]]) -> int:
+    exit_code = 0
+    for git_name, git_dir in gits:
+        exit_code |= report_log(
+            git_dir,
+            git_name,
+            args.num_logs,
+        )
+    return exit_code
 
 
 def run_status(args, gits: list[tuple[str, str]]):
@@ -74,7 +86,7 @@ def run_push(args, gits: list[tuple[str, str]]) -> int:
 
 
 def main():
-    parser = setup_parser(run_push, run_pull, run_status)
+    parser = setup_parser(run_push, run_pull, run_status, run_log)
     args = parser.parse_args()
 
     exclude = [] if args.exclude is None else args.exclude

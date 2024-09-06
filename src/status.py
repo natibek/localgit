@@ -56,7 +56,7 @@ def report_status(
     if num_behind == -1 or num_ahead == -1:
         print_text += f"{failure('Remote Branch Not Found')}"
     else:
-        if num_ahead > 0:
+        if num_ahead > 0 and check_ahead:
             print_text += f"{failure('A')}head:{failure(str(num_ahead))} "
         if num_behind > 0:
             print_text += f"{failure('B')}ehind:{failure(str(num_behind))}"
