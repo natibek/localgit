@@ -1,5 +1,6 @@
 import os
 import subprocess
+from types import coroutine
 
 from pretty_print import failure, success
 
@@ -191,14 +192,19 @@ def commits_ahead(git_dir: str, cur_branch: str) -> int:
     Returns:
         The number of commits the local branch is behind the origin.
     """
-    commits_count = subprocess.check_output(
+    commits_count = subprocess.Popen(
         f"git rev-list --left-right --count {cur_branch}...origin/{cur_branch}".split(
             " "
         ),
-        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
         cwd=git_dir,
-    )[:-1].split("\t")
-    return int(commits_count[0])
+    )
+    output, error = commits_count.communicate()
+
+    if "unknown revision or path not in the working tree" in error.decode("utf-8"):
+        return -1
+    return int(output.decode("utf-8")[:-1].split("\t")[0])
 
 
 def commits_behind(git_dir: str, cur_branch: str) -> int:
@@ -222,14 +228,20 @@ def commits_behind(git_dir: str, cur_branch: str) -> int:
     if "couldn't find remote ref" in error.decode("utf-8"):
         return -1
 
-    commits_count = subprocess.check_output(
+    commits_count = subprocess.Popen(
         f"git rev-list --left-right --count {cur_branch}...origin/{cur_branch}".split(
             " "
         ),
-        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
         cwd=git_dir,
-    )[:-1].split("\t")
-    return int(commits_count[1])
+    )
+    output, error = commits_count.communicate()
+
+    if "unknown revision or path not in the working tree" in error.decode("utf-8"):
+        return -1
+
+    return int(output.decode("utf-8")[:-1].split("\t")[1])
 
 
 def get_unpushed_files(git_dir: str) -> list[str]:
