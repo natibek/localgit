@@ -12,6 +12,14 @@ from utils import get_git_dirs, get_git_names
 
 
 def run_log(args, gits: list[tuple[str, str]]) -> int:
+    """Runs the `localGits log` command with the input arguments.
+
+    Args:
+        args: The parsed CL arguments for the log suparser and their values.
+        gits: List of pairs of the folder names and directories of where the local repositories are.
+
+    Returns exit codes 0 (the command was ran successfully in all repos) or 1 (otherwise).
+    """
     exit_code = 0
     for git_name, git_dir in gits:
         exit_code |= report_log(
@@ -23,12 +31,21 @@ def run_log(args, gits: list[tuple[str, str]]) -> int:
 
 
 def run_status(args, gits: list[tuple[str, str]]):
+    """Runs the `localGits status` command with the input arguments.
+
+    Args:
+        args: The parsed CL arguments for the status suparser and their values.
+        gits: List of pairs of the folder names and directories of where the local repositories are.
+
+    Returns exit codes 0 (all the local repositories are uptodate) or 1 (otherwise).
+    """
+
     all_tags_false = (
         not args.modified
         and not args.untracked
         and not args.check_remote
         and not args.check_ahead
-    )
+    )  # the flags are false by default. If all are false, then run all. Better way?
     untracked = all_tags_false or (args.untracked)
     modified = all_tags_false or args.modified
     check_ahead = all_tags_false or args.check_ahead
@@ -55,6 +72,14 @@ def run_status(args, gits: list[tuple[str, str]]):
 
 
 def run_pull(args, gits: list[tuple[str, str]]) -> int:
+    """Runs the `localGits pull ` command with the input arguments.
+
+    Args:
+        args: The parsed CL arguments for the pull suparser and their values.
+        gits: List of pairs of the folder names and directories of where the local repositories are.
+
+    Returns exit codes 0 (if the pull call was successful in all repos) or 1 (otherwise).
+    """
     exit_code = 0
 
     for git_name, git_dir in gits:
@@ -72,6 +97,14 @@ def run_pull(args, gits: list[tuple[str, str]]) -> int:
 
 
 def run_push(args, gits: list[tuple[str, str]]) -> int:
+    """Runs the `localGits push` command with the input arguments.
+
+    Args:
+        args: The parsed CL arguments for the push suparser and their values.
+        gits: List of pairs of the folder names and directories of where the local repositories are.
+
+    Returns exit codes 0 (if the push call was successful in all repos) or 1 (otherwise).
+    """
 
     exit_code = 0
     for git_name, git_dir in gits:
@@ -86,6 +119,14 @@ def run_push(args, gits: list[tuple[str, str]]) -> int:
 
 
 def main():
+    """Executes the `localGits` command by finding all the local repos and call status, pull,
+    push, or log in each of the repos. Also, setups the approriate argument parser for each of
+    the commands. Looks for enviriomental variables `LOCAL_GITS_EXCLUDE_REPO` which is a `;`
+    separated string containing the names of the repositories to exlude and `LOCAL_GITS_EXCLUDE_DIR`
+    which is also a `;` separated string containing the directories from within no repositories
+    should be included (eg '~/.cache/;~/.local/share/nvim/lazy').
+
+    Returns 1 if there are no local repos."""
     parser = setup_parser(run_push, run_pull, run_status, run_log)
     args = parser.parse_args()
 
@@ -107,12 +148,10 @@ def main():
 
     if len(gits) == 0:
         print("No local github repos found")
-        return 0
+        return 1
 
     gits.sort(key=lambda x: x[0])
-
     args.func(args, gits)
-    return 0
 
 
 if __name__ == "__main__":

@@ -8,7 +8,7 @@ def get_commit_logs(git_dir: str, num_logs: int) -> list[str]:
     """Get the last min(`num_logs`, number of commit logs) logs of a github repository.
 
     Args:
-        git_dir: The github directory where the
+        git_dir: The directory where the local repo is.
         num_logs: Maximum number of logs to get from the repositories.
 
     Returns a list of the last `num_logs`  logs.

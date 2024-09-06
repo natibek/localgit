@@ -1,4 +1,4 @@
-import os
+import os.path
 
 from pretty_print import failure, success, warning
 from utils import (
@@ -11,6 +11,16 @@ from utils import (
 
 
 def report_pull(git_dir: str, git_name: str, silent: bool) -> int:
+    """Pull changes in the origin for all repositories that are behind their origin and
+    report the result of pulling.
+
+    Args:
+        git_dir: The directory where the local repo is.
+        git_name: The name of the folder containing the github repository.
+        silent: Whether to remove details from output.
+
+    Returns exit code 0 (pull is successful) or 1 (otherwise).
+    """
 
     cur_branch = get_cur_branch(git_dir)
     if not cur_branch:

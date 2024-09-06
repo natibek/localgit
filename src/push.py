@@ -15,7 +15,17 @@ from utils import (
 def report_push(
     git_dir: str, git_name: str, silent: bool, push_all: bool, message: str
 ) -> int:
+    """Push all the repositories that are ahead of their origin and report the result of pushing.
 
+    Args:
+        git_dir: The directory where the local repo is.
+        git_name: The name of the folder containing the github repository.
+        silent: Whether to remove details from output.
+        push_all: Whether to commit and push both modified and untracked files.
+        message: The commit message. Default is "new updates"
+
+    Returns exit codes 0 (if the push call was successful) or 1 (otherwise).
+    """
     files = get_unpushed_files(git_dir)
     cur_branch = get_cur_branch(git_dir)
     num_commits_ahead = commits_ahead(git_dir, cur_branch)
@@ -33,7 +43,8 @@ def report_push(
                 + f"<{cur_branch}>"
             )
         return 0
-    elif len(files) > 0:
+
+    if len(files) > 0:
         pass_file_display_text = (
             success(f"{git_name}") + f"<{cur_branch}>{success('->')} "
         )

@@ -13,6 +13,21 @@ def report_status(
     check_remote: bool,
     check_ahead: bool,
 ) -> int:
+    """Report the status of local repositories.
+
+    Args:
+        git_dir: The directory where the local repo is.
+        git_name: The name of the folder containing the github repository.
+        silent: Whether to remove details from output.
+        untracked: Whether to only report untracked files.
+        modified: Whether to only report modified files.
+        check_remote: Whether to only report the number of commits behind the origin the local
+            repository is.
+        check_ahead: Whether to only check the number of commits the local repository is ahead the
+            origin.
+
+    Returns exit codes 0 (the local repository is uptodate) or 1 (otherwise).
+    """
 
     files = get_unpushed_files(git_dir)
     cur_branch = get_cur_branch(git_dir)

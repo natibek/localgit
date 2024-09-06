@@ -1,5 +1,6 @@
 import argparse
 import os.path
+from typing import Any, Callable
 
 
 class readable_dir(argparse.Action):
@@ -35,8 +36,7 @@ def add_common_args(subparser):
     parsers.
 
     Args:
-        subparser: The subparser belonging to status, pull, or push.
-
+        subparser: The subparser belonging to status, pull, log, or push commands.
     """
     subparser.add_argument(
         #       "--git-directories",
@@ -61,7 +61,9 @@ def add_common_args(subparser):
     )
 
 
-def setup_status_subparser(subparsers: argparse._SubParsersAction, run_status):
+def setup_status_subparser(
+    subparsers: argparse._SubParsersAction, run_status: Callable[[Any], int]
+):
     """Setups up the status subparser with the common arguments and status specific arguments
     including --modified, --untracked, --check-remote, --check-ahead."""
     status_parser = subparsers.add_parser(
@@ -92,7 +94,9 @@ def setup_status_subparser(subparsers: argparse._SubParsersAction, run_status):
     )
 
 
-def setup_push_subparser(subparsers: argparse._SubParsersAction, run_push):
+def setup_push_subparser(
+    subparsers: argparse._SubParsersAction, run_push: Callable[[Any], int]
+):
     """Setups up the push subparser with the common arguments and status specific arguments
     including --push-all, --message."""
     push_parser = subparsers.add_parser(
@@ -111,11 +115,13 @@ def setup_push_subparser(subparsers: argparse._SubParsersAction, run_push):
         "-m",
         type=str,
         default="new updates",
-        help="The commit message. (Default 'update')",
+        help="The commit message. (Default 'new updates')",
     )
 
 
-def setup_pull_subparser(subparsers: argparse._SubParsersAction, run_pull):
+def setup_pull_subparser(
+    subparsers: argparse._SubParsersAction, run_pull: Callable[[Any], int]
+):
     """Setups up the pull subparser with the common arguments."""
     pull_parser = subparsers.add_parser(
         "pull", help="Pull from origin for all local repos that are behind."
@@ -124,7 +130,9 @@ def setup_pull_subparser(subparsers: argparse._SubParsersAction, run_pull):
     add_common_args(pull_parser)
 
 
-def setup_log_subparser(subparsers: argparse._SubParsersAction, run_pull):
+def setup_log_subparser(
+    subparsers: argparse._SubParsersAction, run_log: Callable[[Any], int]
+):
     """Setups up the log subparser with the common arguments and"""
     log_parser = subparsers.add_parser(
         "log", help="Get the last n oneline commit logs of local repositories."
@@ -151,20 +159,23 @@ def setup_log_subparser(subparsers: argparse._SubParsersAction, run_pull):
         default=3,
         help="The number of logs to show for each local repo. Maximum is 10. Default if 3.",
     )
-    log_parser.set_defaults(func=run_pull)
+    log_parser.set_defaults(func=run_log)
 
 
 def setup_parser(run_push, run_pull, run_status, run_log) -> argparse.ArgumentParser:
+    """Setups up the argumental parser for `localGits` with subparsers for each of the its
+    commangs (status, log, pull, push)."""
+
     parser = argparse.ArgumentParser(
-        prog="local_gits",
-        description="local_gits helps manage all the local git repos.",
+        prog="localGits",
+        description="localGits helps manage all the local git repos.",
         epilog=(
-            "Use the status, pull, push commands to easily get an"
+            "Use the status, pull, push, log commands to easily get an"
             "overview of the local repo and update them accordingly."
         ),
     )
 
-    subparsers = parser.add_subparsers(required=True, help="Sub-commands")
+    subparsers = parser.add_subparsers(required=True, help="Commands")
     setup_status_subparser(subparsers, run_status)
     setup_pull_subparser(subparsers, run_pull)
     setup_push_subparser(subparsers, run_push)
