@@ -4,11 +4,11 @@ import os.path
 
 from log import report_log
 from parsers import setup_parser
-from pretty_print import success
+from pretty_print import success, warning
 from pull import report_pull
 from push import report_push
 from status import report_status
-from utils import get_git_dirs, get_git_names
+from utils import find_dirs_from_repo_names, get_git_dirs, get_valid_git_dirs
 
 
 def run_log(args, gits: list[tuple[str, str]]) -> int:
@@ -126,7 +126,8 @@ def main():
     which is also a `;` separated string containing the directories from within no repositories
     should be included (eg '~/.cache/;~/.local/share/nvim/lazy').
 
-    Returns 1 if there are no local repos."""
+    Returns exit code as determined by commands.
+    """
     parser = setup_parser(run_push, run_pull, run_status, run_log)
     args = parser.parse_args()
 
@@ -137,21 +138,27 @@ def main():
 
     exclude_dirs = os.environ.get("LOCAL_GITS_EXCLUDE_DIR", "").split(";")
 
-    if git_dirs := args.repo_directories:
-        git_dirs = [
-            git_dir[:-1] if git_dir[-1] == "/" else git_dir for git_dir in git_dirs
-        ]
-        gits = list(zip(get_git_names(git_dirs), git_dirs))
-        args.all = True
+    if not args.repo_names and not args.repo_directories:
+        valid_git_dirs = get_valid_git_dirs(exclude, exclude_dirs)
+        gits = get_git_dirs(valid_git_dirs)
     else:
-        gits = get_git_dirs(exclude, exclude_dirs)
+        gits = []
+        if git_dirs := args.repo_directories:
+            git_dirs = [
+                git_dir[:-1] if git_dir[-1] == "/" else git_dir for git_dir in git_dirs
+            ]
+            gits = get_git_dirs(git_dirs)
+        if repo_names := args.repo_names:
+            valid_git_dirs = get_valid_git_dirs(exclude, exclude_dirs)
+            gits.extend(find_dirs_from_repo_names(repo_names, valid_git_dirs))
+            gits = list(set(gits))
 
     if len(gits) == 0:
-        print("No local github repos found")
+        print(warning("No local github repos found."))
         return 1
 
     gits.sort(key=lambda x: x[0])
-    args.func(args, gits)
+    return args.func(args, gits)
 
 
 if __name__ == "__main__":

@@ -39,9 +39,14 @@ def add_common_args(subparser):
         subparser: The subparser belonging to status, pull, log, or push commands.
     """
     subparser.add_argument(
-        #       "--git-directories",
-        #       "-g",
-        "repo_directories",
+        "repo_names",
+        type=str,
+        nargs="*",
+        help="The names of the folders with github repos to affect.",  # root dir from which github repos should be searched for. ~ by default.",
+    )
+    subparser.add_argument(
+        "--repo-directories",
+        "-r",
         nargs="*",
         action=readable_dir,
         help="The directories with github repos to affect.",  # root dir from which github repos should be searched for. ~ by default.",
@@ -133,14 +138,21 @@ def setup_pull_subparser(
 def setup_log_subparser(
     subparsers: argparse._SubParsersAction, run_log: Callable[[Any], int]
 ):
-    """Setups up the log subparser with the common arguments and"""
+    """Setups up the log subparser with common arguments excluding --silent and add new
+    --num-logs argument."""
+
     log_parser = subparsers.add_parser(
         "log", help="Get the last n oneline commit logs of local repositories."
     )
     log_parser.add_argument(
-        #       "--git-directories",
-        #       "-g",
-        "repo_directories",
+        "repo_names",
+        type=str,
+        nargs="*",
+        help="The names of the folders with github repos to affect.",  # root dir from which github repos should be searched for. ~ by default.",
+    )
+    log_parser.add_argument(
+        "--repo-directories",
+        "-r",
         nargs="*",
         action=readable_dir,
         help="The directories with github repos to affect.",  # root dir from which github repos should be searched for. ~ by default.",
@@ -157,7 +169,7 @@ def setup_log_subparser(
         "-n",
         type=int,
         default=3,
-        help="The number of logs to show for each local repo. Maximum is 10. Default if 3.",
+        help="The number of logs to show for each local repo. Default if 3.",
     )
     log_parser.set_defaults(func=run_log)
 
@@ -171,7 +183,7 @@ def setup_parser(run_push, run_pull, run_status, run_log) -> argparse.ArgumentPa
         description="localGits helps manage all the local git repos.",
         epilog=(
             "Use the status, pull, push, log commands to easily get an"
-            "overview of the local repo and update them accordingly."
+            " overview of the local repo and update them accordingly."
         ),
     )
 

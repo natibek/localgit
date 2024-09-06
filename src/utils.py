@@ -1,7 +1,7 @@
 import os.path
 import subprocess
 
-from pretty_print import failure, success
+from pretty_print import failure, success, warning
 
 
 def get_commit_logs(git_dir: str, num_logs: int) -> list[str]:
@@ -313,15 +313,58 @@ def get_git_names(git_dirs: list[str]) -> list[str]:
     return [os.path.basename(git_dir) for git_dir in git_dirs]
 
 
-def get_git_dirs(exclude: list[str], exclude_dirs: list[str]) -> list[tuple[str, str]]:
-    """Gets the directories and foldernames containing the local clone of the github
-    repositories.
+def find_dirs_from_repo_names(
+    repo_names: list[str], valid_git_dirs: list[str]
+) -> list[tuple[str, str]]:
+    """Finds the directories for each of the specified repo names with binary search.
+
+    Args:
+        repo_names: The user provided list of repo names.
+        valid_git_dirs: All the valid git dirs found locally.
+
+    Returns a list of pairs of folder names and directories of where the repositories are.
+    """
+    dirs = valid_git_dirs[:]
+    dirs.sort(key=lambda git_dir: os.path.basename(git_dir).lower())
+    gits = []
+
+    for name in set(repo_names):
+        mid = len(dirs) // 2
+        low = 0
+        high = len(dirs) - 1
+        found = True
+        iterCount = 0
+
+        while name.lower() != os.path.basename(dirs[mid]).lower():
+            if high == mid == low or iterCount > len(dirs):
+                found = False
+                break
+
+            if name.lower() > os.path.basename(dirs[mid]).lower():
+                low = mid
+                mid = (high + mid) // 2
+            else:
+                high = mid
+                mid = (low + mid) // 2
+            iterCount += 1
+
+        if found:
+            gits.append((os.path.basename(dirs[mid]), dirs[mid]))
+        else:
+            print(warning(f"No local repository folder with name <{name}>."))
+
+    return gits
+
+
+def get_valid_git_dirs(exclude: list[str], exclude_dirs: list[str]) -> list[str]:
+    """Gets all the valid directories containing github repositories excluding directories and
+    folders specified in --exclude-dirs flag or environment variables.
 
     Args:
         exclude: List of the github repo names to exclude.
         exclude_dirs: List of the directories containing github repositories to ignore.
 
-    Returns a list of pairs of folder names and directories of where the repositories are.
+    Returns all the directories containing github repositories after applying exclusion.
     """
     root_dir = os.path.expanduser("~")
     git_dirs = subprocess.check_output(
@@ -336,7 +379,7 @@ def get_git_dirs(exclude: list[str], exclude_dirs: list[str]) -> list[tuple[str,
         if git_dir
     ]
 
-    git_dirs = [
+    return [
         git_dir
         for git_dir in all_git_dirs
         if os.path.basename(git_dir) not in exclude
@@ -346,6 +389,11 @@ def get_git_dirs(exclude: list[str], exclude_dirs: list[str]) -> list[tuple[str,
         )
     ]
 
-    git_names = get_git_names(git_dirs)
 
-    return list(zip(git_names, git_dirs))
+def get_git_dirs(valid_git_dirs: list[str]) -> list[tuple[str, str]]:
+    """Gets the directories and foldernames containing the local clone of the github
+    repositories.
+
+    Returns a list of pairs of folder names and directories of where the repositories are.
+    """
+    return list(zip(get_git_names(valid_git_dirs), valid_git_dirs))
