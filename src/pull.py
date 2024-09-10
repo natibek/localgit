@@ -27,7 +27,6 @@ def report_pull(git_dir: str, git_name: str, silent: bool, verbose: bool) -> int
     if not cur_branch:
         return 0
     num_behind = num_commits_behind(git_dir, cur_branch)
-
     home_path = os.path.expanduser("~")
 
     files = get_unpushed_files(git_dir)

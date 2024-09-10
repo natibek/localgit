@@ -205,25 +205,25 @@ def handle_pull_output(
     return successful, pulled, merged, failed_merge, summary
 
 
-def num_commits_ahead(git_dir: str, cur_branch: str) -> int:
-    """Check how many commits you are ahead of the origin.
+def get_commit_diffs(git_dir: str, cur_branch: str) -> tuple[int, ...]:
+    """Get the commit difference between the local repo and the origin.
 
     Args:
         git_dir: The github directory where the command will be run.
         cur_branch: The branch that the user has checkout.
 
     Returns:
-        The number of commits the local branch is behind the origin.
+        The number of commits the local repo is ahead and behind the origin.
     """
-    # fetch = subprocess.Popen(
-    #     f"git fetch origin {cur_branch}".split(" "),
-    #     cwd=git_dir,
-    #     stdout=subprocess.PIPE,
-    #     stderr=subprocess.PIPE,
-    # )
-    # _, error = fetch.communicate()
-    # if "couldn't find remote ref" in error.decode("utf-8"):
-    #     return -1
+    fetch = subprocess.Popen(
+        f"git fetch origin {cur_branch}".split(" "),
+        cwd=git_dir,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    _, error = fetch.communicate()
+    if "couldn't find remote ref" in error.decode("utf-8"):
+        return -1, -1
 
     commits_count = subprocess.Popen(
         f"git rev-list --left-right --count {cur_branch}...origin/{cur_branch}".split(
@@ -236,8 +236,22 @@ def num_commits_ahead(git_dir: str, cur_branch: str) -> int:
     output, error = commits_count.communicate()
 
     if "unknown revision or path not in the working tree" in error.decode("utf-8"):
-        return -1
-    return int(output.decode("utf-8")[:-1].split("\t")[0])
+        return -1, -1
+
+    return tuple(int(diff) for diff in output.decode("utf-8")[:-1].split("\t"))
+
+
+def num_commits_ahead(git_dir: str, cur_branch: str) -> int:
+    """Check how many commits you are ahead of the origin.
+
+    Args:
+        git_dir: The github directory where the command will be run.
+        cur_branch: The branch that the user has checkout.
+
+    Returns:
+        The number of commits the local repo is behind the origin.
+    """
+    return get_commit_diffs(git_dir, cur_branch)[0]
 
 
 def num_commits_behind(git_dir: str, cur_branch: str) -> int:
@@ -248,33 +262,9 @@ def num_commits_behind(git_dir: str, cur_branch: str) -> int:
         cur_branch: The branch that the user has checkout.
 
     Returns:
-        The number of commits the local branch is behind the origin.
+        The number of commits the local repo is behind the origin.
     """
-
-    fetch = subprocess.Popen(
-        f"git fetch origin {cur_branch}".split(" "),
-        cwd=git_dir,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-    )
-    _, error = fetch.communicate()
-    if "couldn't find remote ref" in error.decode("utf-8"):
-        return -1
-
-    commits_count = subprocess.Popen(
-        f"git rev-list --left-right --count {cur_branch}...origin/{cur_branch}".split(
-            " "
-        ),
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        cwd=git_dir,
-    )
-    output, error = commits_count.communicate()
-
-    if "unknown revision or path not in the working tree" in error.decode("utf-8"):
-        return -1
-
-    return int(output.decode("utf-8")[:-1].split("\t")[1])
+    return get_commit_diffs(git_dir, cur_branch)[1]
 
 
 def get_unpushed_files(git_dir: str) -> list[str]:

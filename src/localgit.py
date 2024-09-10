@@ -41,10 +41,7 @@ def run_status(args, gits: list[tuple[str, str]]):
     """
 
     all_tags_false = (
-        not args.modified
-        and not args.untracked
-        and not args.commits_behind
-        and not args.commits_ahead
+        not args.modified and not args.untracked
     )  # the flags are false by default. If all are false, then run all. Better way?
     untracked = all_tags_false or args.untracked
     modified = all_tags_false or args.modified
@@ -57,14 +54,11 @@ def run_status(args, gits: list[tuple[str, str]]):
             args.silent,
             untracked,
             modified,
-            args.commits_behind,
-            args.commits_ahead,
+            args.commit_diffs,
         )
 
-    if exit_code == 0 and args.commits_behind:
-        print(success("No repos are behind their origin."))
-    elif exit_code == 0:
-        print(success("All repos are pushed."))
+    if exit_code == 0:
+        print(success("Repos are uptodate."))
 
     print()
     return exit_code
@@ -90,7 +84,7 @@ def run_pull(args, gits: list[tuple[str, str]]) -> int:
         )
 
     if exit_code == 0:  # use an enum?
-        print(success("All repos are uptodate."))
+        print(success("Repos are uptodate."))
     print()
 
     return exit_code
@@ -113,7 +107,7 @@ def run_push(args, gits: list[tuple[str, str]]) -> int:
         )
 
     if exit_code == 0:
-        print(success("All repos are uptodate."))
+        print(success("Repos are uptodate."))
     print()
     return exit_code
 

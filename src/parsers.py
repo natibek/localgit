@@ -70,32 +70,27 @@ def setup_status_subparser(
     subparsers: argparse._SubParsersAction, run_status: Callable[[Any], int]
 ):
     """Setups up the status subparser with the common arguments and status specific arguments
-    including --modified, --untracked, --check-behind, --check-ahead."""
+    including --modified, --untracked, --commit-diff."""
     status_parser = subparsers.add_parser(
         "status", help="Show the status of local repos."
     )
     add_common_args(status_parser)
     status_parser.set_defaults(func=run_status)
-    behind_type = status_parser.add_mutually_exclusive_group()
-    behind_type.add_argument(
+    file_type = status_parser.add_mutually_exclusive_group()
+    file_type.add_argument(
         "--modified",
         action="store_true",
         help="Whether to only check for modified files.",
     )
-    behind_type.add_argument(
+    file_type.add_argument(
         "--untracked",
         action="store_true",
         help="Whether to only check for untracked files.",
     )
-    behind_type.add_argument(
-        "--commits-behind",
+    status_parser.add_argument(
+        "--commit-diffs",
         action="store_true",
-        help="Whether to also show how many commits a local repo is behind the origin.",
-    )
-    behind_type.add_argument(
-        "--commits-ahead",
-        action="store_true",
-        help="Whether to also show how many commits a local repo is ahead of the origin.",
+        help="Whether to check how many commits a local repo is ahead and behind the origin.",
     )
 
 

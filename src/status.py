@@ -1,12 +1,7 @@
 import os.path
 
 from .pretty_print import failure, success
-from .utils import (
-    get_cur_branch,
-    get_unpushed_files,
-    num_commits_ahead,
-    num_commits_behind,
-)
+from .utils import get_commit_diffs, get_cur_branch, get_unpushed_files
 
 
 def report_status(
@@ -15,8 +10,7 @@ def report_status(
     silent: bool,
     untracked: bool,
     modified: bool,
-    commits_behind: bool,
-    commits_ahead: bool,
+    commit_diffs: bool,
 ) -> int:
     """Report the status of local repositories.
 
@@ -26,48 +20,36 @@ def report_status(
         silent: Whether to remove details from output.
         untracked: Whether to only report untracked files.
         modified: Whether to only report modified files.
-        commits_behind: Whether to only report the number of commits behind the origin the local
-            repository is.
-        commits_ahead: Whether to only check the number of commits the local repository is ahead the
-            origin.
+        commit_diffs: Whether to check how many commits a local repo is ahead and behind the origin.
 
     Returns exit codes 0 (the local repository is uptodate) or 1 (otherwise).
     """
 
-    files = get_unpushed_files(git_dir)
     cur_branch = get_cur_branch(git_dir)
 
     if not cur_branch:
         return 0
 
-    num_behind = num_commits_behind(git_dir, cur_branch) if commits_behind else 0
-    num_ahead = num_commits_ahead(git_dir, cur_branch) if commits_ahead else 0
+    num_ahead, num_behind = (
+        get_commit_diffs(git_dir, cur_branch) if commit_diffs else (0, 0)
+    )
 
-    print(num_ahead, commits_ahead, num_behind, commits_behind)
-
+    files = get_unpushed_files(git_dir)
     home_path = os.path.expanduser("~")
 
-    if (
-        (commits_ahead and num_ahead == 0)
-        or (commits_behind and num_behind == 0)
-        or len(files) == 0
-    ):
+    if len(files) == 0 and (num_ahead, num_behind) == (0, 0):
         if not silent:
             print(
                 f"{git_dir.replace(home_path, '~')}: {success(git_name)}<{cur_branch}>"
             )
         return 0
 
-    # if len(files) == 0 and num_behind == 0 and num_ahead == 0:
-    #     if not silent:
-    #         print(
-    #             f"{git_dir.replace(home_path, '~')}: {success(git_name)}<{cur_branch}>"
-    #         )
-    #     return 0
+    modified_count = sum(1 for file in files if file.startswith("M")) if modified else 0
+    untracked_count = (
+        sum(1 for file in files if file.startswith("?")) if untracked else 0
+    )
 
-    modified_count = sum(1 for file in files if file.startswith("M"))
-    untracked_count = sum(1 for file in files if file.startswith("?"))
-
+    # cases that are considered a failure.
     if (
         (modified_count and modified)
         or (untracked_count and untracked)
@@ -89,7 +71,7 @@ def report_status(
     if num_behind == -1 or num_ahead == -1:
         print_text += f"{failure('Remote Branch Not Found')}"
     else:
-        if num_ahead > 0 and commits_ahead:
+        if num_ahead > 0:
             print_text += f"{failure('A')}head:{failure(str(num_ahead))} "
         if num_behind > 0:
             print_text += f"{failure('B')}ehind:{failure(str(num_behind))}"
