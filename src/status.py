@@ -37,17 +37,22 @@ def report_status(
     files = get_unpushed_files(git_dir)
     home_path = os.path.expanduser("~")
 
-    if len(files) == 0 and (num_ahead, num_behind) == (0, 0):
+    modified_count = sum(1 for file in files if file.startswith("M")) if modified else 0
+    untracked_count = (
+        sum(1 for file in files if file.startswith("?")) if untracked else 0
+    )
+
+    no_files = (
+        len(files) == 0
+        or (modified_count == 0 and modified and not untracked)
+        or (untracked_count == 0 and untracked and not modified)
+    )
+    if (num_ahead, num_behind) == (0, 0) and no_files:
         if not silent:
             print(
                 f"{git_dir.replace(home_path, '~')}: {success(git_name)}<{cur_branch}>"
             )
         return 0
-
-    modified_count = sum(1 for file in files if file.startswith("M")) if modified else 0
-    untracked_count = (
-        sum(1 for file in files if file.startswith("?")) if untracked else 0
-    )
 
     # cases that are considered a failure.
     if (
