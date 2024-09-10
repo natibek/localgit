@@ -70,7 +70,7 @@ def setup_status_subparser(
     subparsers: argparse._SubParsersAction, run_status: Callable[[Any], int]
 ):
     """Setups up the status subparser with the common arguments and status specific arguments
-    including --modified, --untracked, --check-remote, --check-ahead."""
+    including --modified, --untracked, --check-behind, --check-ahead."""
     status_parser = subparsers.add_parser(
         "status", help="Show the status of local repos."
     )
@@ -88,12 +88,12 @@ def setup_status_subparser(
         help="Whether to only check for untracked files.",
     )
     behind_type.add_argument(
-        "--check-remote",
+        "--commits-behind",
         action="store_true",
         help="Whether to also show how many commits a local repo is behind the origin.",
     )
     behind_type.add_argument(
-        "--check-ahead",
+        "--commits-ahead",
         action="store_true",
         help="Whether to also show how many commits a local repo is ahead of the origin.",
     )
@@ -113,7 +113,7 @@ def setup_push_subparser(
         "--push-all",
         "-A",
         action="store_true",
-        help="Whether to push all the changes (ie including untracked changes.",
+        help="Whether to push all the changes (ie including untracked changes).",
     )
     push_parser.add_argument(
         "--message",
@@ -121,6 +121,12 @@ def setup_push_subparser(
         type=str,
         default="new updates",
         help="The commit message. (Default 'new updates')",
+    )
+    push_parser.add_argument(
+        "--verbose",
+        "-v",
+        action="store_true",
+        help="Print summary for all repos (including those unaffected by command).",
     )
 
 
@@ -133,6 +139,12 @@ def setup_pull_subparser(
     )
     pull_parser.set_defaults(func=run_pull)
     add_common_args(pull_parser)
+    pull_parser.add_argument(
+        "--verbose",
+        "-v",
+        action="store_true",
+        help="Print summary for all repos (including those unaffected by command).",
+    )
 
 
 def setup_log_subparser(

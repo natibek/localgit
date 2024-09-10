@@ -1,7 +1,12 @@
 import os.path
 
 from pretty_print import failure, success
-from utils import commits_ahead, commits_behind, get_cur_branch, get_unpushed_files
+from utils import (
+    get_cur_branch,
+    get_unpushed_files,
+    num_commits_ahead,
+    num_commits_behind,
+)
 
 
 def report_status(
@@ -10,8 +15,8 @@ def report_status(
     silent: bool,
     untracked: bool,
     modified: bool,
-    check_remote: bool,
-    check_ahead: bool,
+    commits_behind: bool,
+    commits_ahead: bool,
 ) -> int:
     """Report the status of local repositories.
 
@@ -21,9 +26,9 @@ def report_status(
         silent: Whether to remove details from output.
         untracked: Whether to only report untracked files.
         modified: Whether to only report modified files.
-        check_remote: Whether to only report the number of commits behind the origin the local
+        commints_behind: Whether to only report the number of commits behind the origin the local
             repository is.
-        check_ahead: Whether to only check the number of commits the local repository is ahead the
+        commits_ahead: Whether to only check the number of commits the local repository is ahead the
             origin.
 
     Returns exit codes 0 (the local repository is uptodate) or 1 (otherwise).
@@ -35,12 +40,16 @@ def report_status(
     if not cur_branch:
         return 0
 
-    num_behind = commits_behind(git_dir, cur_branch) if check_remote else 0
-    num_ahead = commits_ahead(git_dir, cur_branch) if not check_remote else 0
+    num_behind = num_commits_behind(git_dir, cur_branch) if commits_behind else 0
+    num_ahead = num_commits_ahead(git_dir, cur_branch) if not commits_behind else 0
 
     home_path = os.path.expanduser("~")
 
-    if len(files) == 0 and num_behind == 0 and num_ahead == 0:
+    if (
+        len(files) == 0
+        or (num_behind == 0 and commits_behind)
+        or (num_ahead == 0 and commits_ahead)
+    ):
         if not silent:
             print(
                 f"{git_dir.replace(home_path, '~')}: {success(git_name)}<{cur_branch}>"
@@ -71,7 +80,7 @@ def report_status(
     if num_behind == -1 or num_ahead == -1:
         print_text += f"{failure('Remote Branch Not Found')}"
     else:
-        if num_ahead > 0 and check_ahead:
+        if num_ahead > 0 and commits_ahead:
             print_text += f"{failure('A')}head:{failure(str(num_ahead))} "
         if num_behind > 0:
             print_text += f"{failure('B')}ehind:{failure(str(num_behind))}"

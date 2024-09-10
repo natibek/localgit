@@ -3,14 +3,14 @@ import os.path
 from pretty_print import failure, success, warning
 from utils import (
     call_pull,
-    commits_behind,
     get_cur_branch,
     get_unpushed_files,
     handle_pull_output,
+    num_commits_behind,
 )
 
 
-def report_pull(git_dir: str, git_name: str, silent: bool) -> int:
+def report_pull(git_dir: str, git_name: str, silent: bool, verbose: bool) -> int:
     """Pull changes in the origin for all repositories that are behind their origin and
     report the result of pulling.
 
@@ -18,6 +18,7 @@ def report_pull(git_dir: str, git_name: str, silent: bool) -> int:
         git_dir: The directory where the local repo is.
         git_name: The name of the folder containing the github repository.
         silent: Whether to remove details from output.
+        verbose: Whether to print for directories unaffected by the command.
 
     Returns exit code 0 (pull is successful) or 1 (otherwise).
     """
@@ -25,7 +26,7 @@ def report_pull(git_dir: str, git_name: str, silent: bool) -> int:
     cur_branch = get_cur_branch(git_dir)
     if not cur_branch:
         return 0
-    num_behind = commits_behind(git_dir, cur_branch)
+    num_behind = num_commits_behind(git_dir, cur_branch)
 
     home_path = os.path.expanduser("~")
 
@@ -44,7 +45,7 @@ def report_pull(git_dir: str, git_name: str, silent: bool) -> int:
     )
 
     if num_behind == 0:
-        if not silent:
+        if not silent and verbose:
             print(
                 f"{git_dir.replace(home_path, '~')}: {success(git_name)}<{cur_branch}>"
             )

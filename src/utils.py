@@ -206,7 +206,7 @@ def handle_pull_output(
     return successful, pulled, merged, failed_merge, summary
 
 
-def commits_ahead(git_dir: str, cur_branch: str) -> int:
+def num_commits_ahead(git_dir: str, cur_branch: str) -> int:
     """Check how many commits you are ahead of the origin.
 
     Args:
@@ -231,7 +231,7 @@ def commits_ahead(git_dir: str, cur_branch: str) -> int:
     return int(output.decode("utf-8")[:-1].split("\t")[0])
 
 
-def commits_behind(git_dir: str, cur_branch: str) -> int:
+def num_commits_behind(git_dir: str, cur_branch: str) -> int:
     """Check how many commits you are behind the origin.
 
     Args:

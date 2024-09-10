@@ -43,12 +43,12 @@ def run_status(args, gits: list[tuple[str, str]]):
     all_tags_false = (
         not args.modified
         and not args.untracked
-        and not args.check_remote
-        and not args.check_ahead
+        and not args.commits_behind
+        and not args.commits_ahead
     )  # the flags are false by default. If all are false, then run all. Better way?
-    untracked = all_tags_false or (args.untracked)
+    untracked = all_tags_false or args.untracked
     modified = all_tags_false or args.modified
-    check_ahead = all_tags_false or args.check_ahead
+    commits_ahead = all_tags_false or args.commits_ahead
 
     exit_code = 0
     for git_name, git_dir in gits:
@@ -58,11 +58,11 @@ def run_status(args, gits: list[tuple[str, str]]):
             args.silent,
             untracked,
             modified,
-            args.check_remote,
-            check_ahead,
+            args.commits_behind,
+            commits_ahead,
         )
 
-    if exit_code == 0 and args.check_remote:
+    if exit_code == 0 and args.commits_behind:
         print(success("No repos are behind their origin."))
     elif exit_code == 0:
         print(success("All repos are pushed."))
@@ -87,6 +87,7 @@ def run_pull(args, gits: list[tuple[str, str]]) -> int:
             git_dir,
             git_name,
             args.silent,
+            args.verbose,
         )
 
     if exit_code == 0:  # use an enum?
@@ -109,7 +110,7 @@ def run_push(args, gits: list[tuple[str, str]]) -> int:
     exit_code = 0
     for git_name, git_dir in gits:
         exit_code |= report_push(
-            git_dir, git_name, args.silent, args.push_all, args.message
+            git_dir, git_name, args.silent, args.verbose, args.push_all, args.message
         )
 
     if exit_code == 0:
