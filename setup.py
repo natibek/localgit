@@ -2,7 +2,7 @@ import io
 
 import setuptools
 
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 
 description = "localgit is a tool for managing local git repo clones."
 

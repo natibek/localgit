@@ -1,6 +1,6 @@
 # localgit
 
-Command line tool for managing local git repository clones. It includes `status`, `pull`, `push`, and `log` commands which have similar functionalities as their `git` counterparts but affect all/specified local repositories.
+Command line tool for managing all local git repository clones simultaneously. It includes `status`, `pull`, `push`, and `log` commands which have similar functionalities as their `git` counterparts but affect all/specified local repositories.
 
 To always ignore specific repositories or whole directories when using localgits, you can add them to environmental variables `LOCALGIT_EXCLUDE_REPO` and `LOCALGIT_EXCLUDE_DIR`. These environmental variables are `;` separated strings. Any local repository clone with a name matching one found in `LOCALGIT_EXCLUDE_REPO` and any local repository clone found within any of the directories in `LOCALGIT_EXCLUDE_DIR` will not be affected/checked by `localgit`.
 

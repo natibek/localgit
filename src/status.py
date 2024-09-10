@@ -26,7 +26,7 @@ def report_status(
         silent: Whether to remove details from output.
         untracked: Whether to only report untracked files.
         modified: Whether to only report modified files.
-        commints_behind: Whether to only report the number of commits behind the origin the local
+        commits_behind: Whether to only report the number of commits behind the origin the local
             repository is.
         commits_ahead: Whether to only check the number of commits the local repository is ahead the
             origin.
@@ -41,15 +41,11 @@ def report_status(
         return 0
 
     num_behind = num_commits_behind(git_dir, cur_branch) if commits_behind else 0
-    num_ahead = num_commits_ahead(git_dir, cur_branch) if not commits_behind else 0
+    num_ahead = num_commits_ahead(git_dir, cur_branch) if commits_ahead else 0
 
     home_path = os.path.expanduser("~")
 
-    if (
-        len(files) == 0
-        or (num_behind == 0 and commits_behind)
-        or (num_ahead == 0 and commits_ahead)
-    ):
+    if len(files) == 0 and num_behind == 0 and num_ahead == 0:
         if not silent:
             print(
                 f"{git_dir.replace(home_path, '~')}: {success(git_name)}<{cur_branch}>"
