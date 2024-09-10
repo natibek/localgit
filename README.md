@@ -20,7 +20,7 @@ For all commands in localgit, the following CL optional arguments are available:
 
 1. `repo_names`: The names of the folders with git repos to check/affect.
 1. `--repo-directories`, `-r`: Directories with git repos to affect. Their validity is checked by the parser.
-1. `--exclude`, '-x': The names of the git repo folders you don't want to check/affect.
+1. `--exclude`, `-x`: The names of the git repo folders you don't want to check/affect.
 1. `--silent`, `-s`: Do not print repo specific outputs. Only print holistic details. (not available for `localgit log`)
 
 ## `localgit status`
@@ -33,9 +33,9 @@ Has the following arguments:
 1. `--untracked`: Only check for untracked files. \~
 1. `--commit-diffs`: Check how many commits ahead and behind the origin the local repo clone is. \*
 
-*\~ Arguments are mutually exclusive.*
+_\~ Arguments are mutually exclusive._
 
-*\* Uses `git rev-list --left-right --count <branch>...origin/<branch>`.*
+_\* Uses `git rev-list --left-right --count <branch>...origin/<branch>`._
 
 ## `localgit pull`
 
