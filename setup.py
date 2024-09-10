@@ -2,11 +2,9 @@ import io
 
 import setuptools
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 
 description = "localgit is a tool for managing local git repo clones."
-
-long_description = io.open("README.md", encoding="utf-8").read()
 
 setuptools.setup(
     name="localgit",
@@ -17,7 +15,8 @@ setuptools.setup(
     python_requires=(">=3.11.0"),
     license="Apache 2.0",
     description=description,
-    long_description=long_description,
+    long_description=open("README.md").read(),
+    long_description_content_type="text/markdown",
     packages=["src"],
     entry_points={
         "console_scripts": [

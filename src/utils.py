@@ -11,7 +11,7 @@ def get_commit_logs(git_dir: str, num_logs: int) -> list[str]:
         git_dir: The directory where the local repo is.
         num_logs: Maximum number of logs to get from the repositories.
 
-    Returns a list of the last `num_logs`  logs.
+    Returns a list of the last `num_logs` logs.
     """
     logs_output = subprocess.Popen(
         ["git", "log", "--oneline"],
