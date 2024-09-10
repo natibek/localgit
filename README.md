@@ -42,7 +42,7 @@ Has the following argument:
 
 ## `localgit push`
 
-Calls `git commit -am new updates ; git push` in each git repository clone (therefore only commits and pushes modified files). Ensures that the local clone is not behind the origin.
+Calls `git commit -am "new updates" ; git push` in each git repository clone (therefore only commits and pushes modified files). Ensures that the local clone is not behind the origin.
 
 Has the following arguments:
 1. `--push-all`, `-A`: Push all the changes including untracked ones.
