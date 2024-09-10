@@ -1,7 +1,7 @@
 import os.path
 
-from pretty_print import failure, success
-from utils import (
+from .pretty_print import failure, success
+from .utils import (
     get_cur_branch,
     get_unpushed_files,
     num_commits_ahead,

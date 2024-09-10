@@ -1,7 +1,7 @@
 import os.path
 
-from pretty_print import success
-from utils import get_commit_logs, get_cur_branch
+from .pretty_print import success
+from .utils import get_commit_logs, get_cur_branch
 
 
 def report_log(git_dir: str, git_name: str, num_logs: int) -> int:

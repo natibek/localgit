@@ -1,7 +1,7 @@
 import os.path
 import subprocess
 
-from pretty_print import failure, success, warning
+from .pretty_print import failure, success, warning
 
 
 def get_commit_logs(git_dir: str, num_logs: int) -> list[str]:
@@ -28,7 +28,7 @@ def get_commit_logs(git_dir: str, num_logs: int) -> list[str]:
     return logs[: min(len(logs), num_logs)]
 
 
-def call_commit_modified(git_dir: str, message: str = "update") -> str:
+def call_commit_modified(git_dir: str, message: str) -> str:
     """Call `git commit -am ` with a message.
 
     Args:
@@ -38,7 +38,6 @@ def call_commit_modified(git_dir: str, message: str = "update") -> str:
     Returns:
         The text output from the command.
     """
-    print(git_dir)
     commit_output = subprocess.check_output(
         ["git", "commit", "-am", message],
         cwd=git_dir,

@@ -42,27 +42,27 @@ def add_common_args(subparser):
         "repo_names",
         type=str,
         nargs="*",
-        help="The names of the folders with github repos to affect.",  # root dir from which github repos should be searched for. ~ by default.",
+        help="The names of the git repo folders to affect.",  # root dir from which github repos should be searched for. ~ by default.",
     )
     subparser.add_argument(
         "--repo-directories",
         "-r",
         nargs="*",
         action=readable_dir,
-        help="The directories with github repos to affect.",  # root dir from which github repos should be searched for. ~ by default.",
+        help="The directories with git repos to affect.",  # root dir from which github repos should be searched for. ~ by default.",
     )
     subparser.add_argument(
         "--exclude",
         "-x",
         type=str,
         nargs="*",
-        help="The names of the github repos you don't want to check.",
+        help="The names of the git repo folders you don't want to check.",
     )
     subparser.add_argument(
         "--silent",
         "-s",
         action="store_true",
-        help="Only print repos that are ahead, behind, and/or affected by commands.",
+        help="Do not print repo specific outputs. Only print holistic details.",
     )
 
 
@@ -187,12 +187,12 @@ def setup_log_subparser(
 
 
 def setup_parser(run_push, run_pull, run_status, run_log) -> argparse.ArgumentParser:
-    """Setups up the argumental parser for `localGits` with subparsers for each of the its
+    """Setups up the argumental parser for `localgit` with subparsers for each of the its
     commangs (status, log, pull, push)."""
 
     parser = argparse.ArgumentParser(
-        prog="localGits",
-        description="localGits helps manage all the local git repos.",
+        prog="localgit",
+        description="localgit helps manage all the local git repos.",
         epilog=(
             "Use the status, pull, push, log commands to easily get an"
             " overview of the local repo and update them accordingly."

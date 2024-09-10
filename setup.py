@@ -4,14 +4,14 @@ import setuptools
 
 __version__ = "0.0.1"
 
-description = "local_gits is a tool for managing local github repos."
+description = "localgit is a tool for managing local git repo clones."
 
 long_description = io.open("README.md", encoding="utf-8").read()
 
 setuptools.setup(
-    name="local_gits",
+    name="localgit",
     version=__version__,
-    url="https://github.com/natibek/local_gits/tree/main",
+    url="https://github.com/natibek/localgit/tree/main",
     author="Nathnael Bekele",
     author_email="nwtbekele@gmail.com",
     python_requires=(">=3.11.0"),
@@ -21,7 +21,7 @@ setuptools.setup(
     packages=["src"],
     entry_points={
         "console_scripts": [
-            "local_gits=src.local_gits:main",
+            "localgit=src.localgit:main",
         ],
     },
     classifiers=[

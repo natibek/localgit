@@ -1,7 +1,7 @@
 import os.path
 
-from pretty_print import failure, success
-from utils import (
+from .pretty_print import failure, success
+from .utils import (
     call_add_all,
     call_commit,
     call_commit_modified,

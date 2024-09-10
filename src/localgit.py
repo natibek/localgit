@@ -2,13 +2,13 @@
 
 import os.path
 
-from log import report_log
-from parsers import setup_parser
-from pretty_print import success, warning
-from pull import report_pull
-from push import report_push
-from status import report_status
-from utils import find_dirs_from_repo_names, get_git_dirs, get_valid_git_dirs
+from .log import report_log
+from .parsers import setup_parser
+from .pretty_print import success, warning
+from .pull import report_pull
+from .push import report_push
+from .status import report_status
+from .utils import find_dirs_from_repo_names, get_git_dirs, get_valid_git_dirs
 
 
 def run_log(args, gits: list[tuple[str, str]]) -> int:
@@ -134,10 +134,10 @@ def main():
 
     exclude = [] if args.exclude is None else args.exclude
 
-    if env_exclude := os.environ.get("LOCAL_GITS_EXCLUDE_REPO"):
+    if env_exclude := os.environ.get("LOCALGIT_EXCLUDE_REPO"):
         exclude.extend(env_exclude.split(";"))
 
-    exclude_dirs = os.environ.get("LOCAL_GITS_EXCLUDE_DIR", "").split(";")
+    exclude_dirs = os.environ.get("LOCALGIT_EXCLUDE_DIR", "").split(";")
 
     if not args.repo_names and not args.repo_directories:
         valid_git_dirs = get_valid_git_dirs(exclude, exclude_dirs)

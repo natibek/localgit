@@ -1,7 +1,7 @@
 import os.path
 
-from pretty_print import failure, success, warning
-from utils import (
+from .pretty_print import failure, success, warning
+from .utils import (
     call_pull,
     get_cur_branch,
     get_unpushed_files,
