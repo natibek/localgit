@@ -42,7 +42,7 @@ def add_common_args(subparser):
         "repo_names",
         type=str,
         nargs="*",
-        help="The names of the git repo folders to affect.",  # root dir from which github repos should be searched for. ~ by default.",
+        help="The names of the git repo folders to affect. This is case insensitive.",  # root dir from which github repos should be searched for. ~ by default.",
     )
     subparser.add_argument(
         "--repo-directories",

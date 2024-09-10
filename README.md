@@ -18,7 +18,7 @@ Otherwise, install globally like usual for Windows and Mac.
 
 For all commands in localgit, the following CL optional arguments are available:
 
-1. `repo_names`: The names of the folders with git repos to check/affect.
+1. `repo_names`: The names of the folders with git repos to check/affect. This is case insensitive.
 1. `--repo-directories`, `-r`: Directories with git repos to affect. Their validity is checked by the parser.
 1. `--exclude`, `-x`: The names of the git repo folders you don't want to check/affect.
 1. `--silent`, `-s`: Do not print repo specific outputs. Only print holistic details. (not available for `localgit log`)

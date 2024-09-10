@@ -341,11 +341,11 @@ def find_dirs_from_repo_names(
                 break
 
             if name.lower() > os.path.basename(dirs[mid]).lower():
-                low = mid
-                mid = (high + mid) // 2
+                low = mid + 1
             else:
-                high = mid
-                mid = (low + mid) // 2
+                high = mid - 1
+
+            mid = (high + low) // 2
             iterCount += 1
 
         if found:
