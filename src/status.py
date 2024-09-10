@@ -45,12 +45,23 @@ def report_status(
 
     home_path = os.path.expanduser("~")
 
-    if len(files) == 0 and num_behind == 0 and num_ahead == 0:
+    if (
+        (commits_ahead and num_ahead == 0)
+        or (commits_behind and num_behind == 0)
+        or len(files) == 0
+    ):
         if not silent:
             print(
                 f"{git_dir.replace(home_path, '~')}: {success(git_name)}<{cur_branch}>"
             )
         return 0
+
+    # if len(files) == 0 and num_behind == 0 and num_ahead == 0:
+    #     if not silent:
+    #         print(
+    #             f"{git_dir.replace(home_path, '~')}: {success(git_name)}<{cur_branch}>"
+    #         )
+    #     return 0
 
     modified_count = sum(1 for file in files if file.startswith("M"))
     untracked_count = sum(1 for file in files if file.startswith("?"))

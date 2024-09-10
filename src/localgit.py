@@ -48,7 +48,6 @@ def run_status(args, gits: list[tuple[str, str]]):
     )  # the flags are false by default. If all are false, then run all. Better way?
     untracked = all_tags_false or args.untracked
     modified = all_tags_false or args.modified
-    commits_ahead = all_tags_false or args.commits_ahead
 
     exit_code = 0
     for git_name, git_dir in gits:
@@ -59,7 +58,7 @@ def run_status(args, gits: list[tuple[str, str]]):
             untracked,
             modified,
             args.commits_behind,
-            commits_ahead,
+            args.commits_ahead,
         )
 
     if exit_code == 0 and args.commits_behind:
