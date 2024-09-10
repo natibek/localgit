@@ -43,6 +43,8 @@ def report_status(
     num_behind = num_commits_behind(git_dir, cur_branch) if commits_behind else 0
     num_ahead = num_commits_ahead(git_dir, cur_branch) if commits_ahead else 0
 
+    print(num_ahead, commits_ahead, num_behind, commits_behind)
+
     home_path = os.path.expanduser("~")
 
     if (
