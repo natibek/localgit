@@ -2,3 +2,5 @@ src/__pycache__/
 .venv
 localgit.egg-info
 build
+dist/
+.pypirc

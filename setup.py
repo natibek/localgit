@@ -2,7 +2,7 @@ import io
 
 import setuptools
 
-__version__ = "0.0.1"
+__version__ = "1.0.0"
 
 description = "localgit is a tool for managing local git repo clones."
 
@@ -26,8 +26,8 @@ setuptools.setup(
     },
     classifiers=[
         "Development Status :: 4 - Beta",
-        "License :: OSI Approved :: Apache 2.0",
-        "Programming Language :: Python",
+        "License :: OSI Approved :: Apache Software License",
+        "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
     ],
 )
