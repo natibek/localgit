@@ -215,6 +215,16 @@ def num_commits_ahead(git_dir: str, cur_branch: str) -> int:
     Returns:
         The number of commits the local branch is behind the origin.
     """
+    # fetch = subprocess.Popen(
+    #     f"git fetch origin {cur_branch}".split(" "),
+    #     cwd=git_dir,
+    #     stdout=subprocess.PIPE,
+    #     stderr=subprocess.PIPE,
+    # )
+    # _, error = fetch.communicate()
+    # if "couldn't find remote ref" in error.decode("utf-8"):
+    #     return -1
+
     commits_count = subprocess.Popen(
         f"git rev-list --left-right --count {cur_branch}...origin/{cur_branch}".split(
             " "
