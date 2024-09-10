@@ -1,6 +1,6 @@
 import setuptools
 
-__version__ = "1.0.3"
+from src._version import __version__
 
 description = "localgit is a tool for managing local git repo clones."
 
