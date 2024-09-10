@@ -28,11 +28,10 @@ jobs:
         env:
           PYPI_API_KEY: ${{ secrets.PYPI_PSWRD }}
         run: |
-          publish_package.sh
+          ./publish_package.sh
 
   release:
     name: Publish release on GitHub
-    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       contents: write
