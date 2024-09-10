@@ -28,7 +28,8 @@ jobs:
         env:
           PYPI_API_KEY: ${{ secrets.PYPI_PSWRD }}
         run: |
-          ./publish_package.sh
+          python -m build
+          twine upload dist/* -u __token__ -p "$PYPI_API_KEY"
 
   release:
     name: Publish release on GitHub
