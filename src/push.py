@@ -51,8 +51,16 @@ def report_push(
         if push_all:
             call_add_all(git_dir)
             commit_output = call_commit(git_dir, message)
-        else:
+        elif any(file.startswith("M") for file in files):
             commit_output = call_commit_modified(git_dir, message)
+        elif not silent:
+            print(
+                f"{git_dir.replace(home_path, '~')}: "
+                + success(f"{git_name}")
+                + f"<{cur_branch}>"
+            )
+            return 0
+
     elif num_commits_ahead > 0:
         # cases like merges from other branch into local branch.
         # No file is shown as modified or untracked but there are commits that have not been pushed

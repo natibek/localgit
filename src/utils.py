@@ -38,6 +38,7 @@ def call_commit_modified(git_dir: str, message: str = "update") -> str:
     Returns:
         The text output from the command.
     """
+    print(git_dir)
     commit_output = subprocess.check_output(
         ["git", "commit", "-am", message],
         cwd=git_dir,
