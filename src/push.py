@@ -73,7 +73,6 @@ def report_push(
             else ""
         )
 
-        print("here")
         if push_all:
             call_add_all(git_dir)
             commit_output = call_commit(
@@ -97,8 +96,6 @@ def report_push(
         pass_file_display_text = success(f"{git_name}") + f"<{cur_branch}> "
         commit_output = ""
 
-    print("here")
-    exit()
     successful = call_push(git_dir, cur_branch)
 
     fail_file_display_text = failure(f"{git_name}") + f"<{cur_branch}>{failure('->')} "

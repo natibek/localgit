@@ -87,16 +87,19 @@ def call_push(git_dir: str, cur_branch: str) -> bool:
     Returns:
         Whether the command was successful.
     """
+    print("here")
+    exit()
     push_output = subprocess.Popen(
         "git push".split(" "),
         cwd=git_dir,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
     )
-    _, error = push_output.communicate()
+    output, error = push_output.communicate()
 
-    # print(f"{output=}")
-    # print(f"{error=}")
+    print(f"{output=}")
+    print(f"{error=}")
+    exit()
 
     if "git push --set-upstream origin" in error.decode("utf-8"):
         push_output = subprocess.Popen(
