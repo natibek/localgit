@@ -102,10 +102,10 @@ def call_push(git_dir: str, cur_branch: str) -> PushStatus:
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
     )
-    output, error = push_output.communicate()
+    _, error = push_output.communicate()
 
-    print(f"{output=}")
-    print(f"{error=}")
+    # print(f"{output=}")
+    # print(f"{error=}")
     error = error.decode("utf-8")
     if "push declined due to repository rule violations" in error:
         return PushStatus.REPO_VIOLATION
