@@ -54,11 +54,32 @@ def report_push(
         pass_file_display_text = (
             success(f"{git_name}") + f"<{cur_branch}>{success('->')} "
         )
+
+        has_modified = any(file.startswith("M") for file in files)
+        has_untracked = any(file.startswith("?") for file in files)
+
+        modified_message = (
+            "Modified "
+            + ", ".join(file[2:] for file in files if file.startswith("M"))
+            + ". "
+            if has_modified and not message
+            else ""
+        )
+        added_message = (
+            "Added "
+            + ", ".join(file[3:] for file in files if file.startswith("?"))
+            + ". "
+            if has_untracked and not message
+            else ""
+        )
+
         if push_all:
             call_add_all(git_dir)
-            commit_output = call_commit(git_dir, message)
-        elif any(file.startswith("M") for file in files):
-            commit_output = call_commit_modified(git_dir, message)
+            commit_output = call_commit(
+                git_dir, message or (modified_message + added_message).strip()
+            )
+        elif has_modified:
+            commit_output = call_commit_modified(git_dir, message or modified_message)
         elif not silent and verbose:
             print(
                 f"{git_dir.replace(home_path, '~')}: "

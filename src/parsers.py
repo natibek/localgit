@@ -114,8 +114,7 @@ def setup_push_subparser(
         "--message",
         "-m",
         type=str,
-        default="new updates",
-        help="The commit message. (Default 'new updates')",
+        help="The commit message. (Default is 'modified <comma separated list of modified files>. added <comma separated list of untracked files>)",
     )
     push_parser.add_argument(
         "--verbose",

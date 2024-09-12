@@ -52,7 +52,7 @@ Calls `git commit -am "new updates" ; git push` in each git repository clone (th
 Has the following arguments:
 
 1. `--push-all`, `-A`: Push all the changes including untracked ones.
-1. `--message`, `-m`: The commit message. "new updates" by default.
+1. `--message`, `-m`: The commit message. Default is 'modified <comma separated list of modified files>. added <comma separated list of untracked files>.
 1. `--verbose`, `-v`: Print summary for all repos (including those unaffected by command).
 
 ## `localgit log`
