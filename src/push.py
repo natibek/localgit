@@ -90,7 +90,8 @@ def report_push(
         else:
             return 0
 
-    elif num_ahead > 0:
+    else:
+        assert num_ahead > 0
         # cases like merges from other branch into local branch.
         # No file is shown as modified or untracked but there are commits that have not been pushed
         pass_file_display_text = success(f"{git_name}") + f"<{cur_branch}> "
