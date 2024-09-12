@@ -336,36 +336,42 @@ def find_dirs_from_repo_names(
 
     Returns a list of pairs of folder names and directories of where the repositories are.
     """
-    dirs = valid_git_dirs[:]
-    dirs.sort(key=lambda git_dir: os.path.basename(git_dir))
+    dirs_map = {os.path.basename(git_dir): git_dir for git_dir in valid_git_dirs}
+    # gits = [(name, dirs_map[name]) for name in set(repo_names) if name in dirs_map]
     gits = []
 
     for name in set(repo_names):
-        mid = len(dirs) // 2
-        low = 0
-        high = len(dirs) - 1
-        found = True
-        iterCount = 0
-
-        while name != os.path.basename(dirs[mid]):
-            if high == mid == low or iterCount > len(dirs):
-                found = False
-                break
-
-            if name > os.path.basename(dirs[mid]):
-                low = mid + 1
-            else:
-                high = mid - 1
-
-            mid = (high + low) // 2
-            iterCount += 1
-
-        if found:
-            gits.append((os.path.basename(dirs[mid]), dirs[mid]))
+        if name in dirs_map:
+            gits.append((name, dirs_map[name]))
         else:
-            print(warning(f"No local repository folder with name <{name}>."))
+            print(
+                warning(
+                    f"No folder with name <{name}> containing a git repo was found."
+                )
+            )
 
     return gits
+
+
+def get_all_git_dirs() -> list[str]:
+    """Gets all the local git repo clones found on the device. Uses `file . -name .git` ran on the
+    /home/$USER/ directory.
+
+    Returns all the git repo clones found on the device.
+    """
+
+    root_dir = os.path.expanduser("~")
+    git_dirs = subprocess.check_output(
+        ["find", ".", "-name", ".git"],
+        text=True,
+        cwd=root_dir,
+    ).split("\n")
+
+    return [
+        os.path.abspath(os.path.dirname(root_dir + git_dir[1:]))
+        for git_dir in git_dirs
+        if git_dir
+    ]
 
 
 def get_valid_git_dirs(exclude: list[str], exclude_dirs: list[str]) -> list[str]:
@@ -376,20 +382,10 @@ def get_valid_git_dirs(exclude: list[str], exclude_dirs: list[str]) -> list[str]
         exclude: List of the github repo names to exclude.
         exclude_dirs: List of the directories containing github repositories to ignore.
 
-    Returns all the directories containing github repositories after applying exclusion.
+    Returns all the directories containing git repositories after applying exclusion.
     """
-    root_dir = os.path.expanduser("~")
-    git_dirs = subprocess.check_output(
-        ["find", ".", "-name", ".git"],
-        text=True,
-        cwd=root_dir,
-    ).split("\n")
 
-    all_git_dirs = [
-        os.path.abspath(os.path.dirname(root_dir + git_dir[1:]))
-        for git_dir in git_dirs
-        if git_dir
-    ]
+    all_git_dirs = get_all_git_dirs()
 
     return [
         git_dir
@@ -410,20 +406,9 @@ def get_excluded_git_dirs(exclude: list[str], exclude_dirs: list[str]) -> list[s
         exclude: List of the github repo names to exclude.
         exclude_dirs: List of the directories containing github repositories to ignore.
 
-    Returns all the directories containing github repositories after applying exclusion.
+    Returns all the directories containing git repositories after applying exclusion.
     """
-    root_dir = os.path.expanduser("~")
-    git_dirs = subprocess.check_output(
-        ["find", ".", "-name", ".git"],
-        text=True,
-        cwd=root_dir,
-    ).split("\n")
-
-    all_git_dirs = [
-        os.path.abspath(os.path.dirname(root_dir + git_dir[1:]))
-        for git_dir in git_dirs
-        if git_dir
-    ]
+    all_git_dirs = get_all_git_dirs()
 
     return [
         git_dir
