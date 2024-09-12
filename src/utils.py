@@ -1,7 +1,16 @@
 import os.path
 import subprocess
+from enum import Enum
 
 from .pretty_print import failure, success, warning
+
+
+class PushStatus(Enum):
+    """Enum for storing the status of the attemped push."""
+
+    SUCCESSFUL = 0
+    REPO_VIOLATION = 1
+    OTHER_FAILURE = 2
 
 
 def get_commit_logs(git_dir: str, num_logs: int) -> list[str]:
@@ -77,7 +86,7 @@ def call_add_all(git_dir: str) -> None:
     )
 
 
-def call_push(git_dir: str, cur_branch: str) -> bool:
+def call_push(git_dir: str, cur_branch: str) -> PushStatus:
     """Call `git push` or `git push -u origin cur_branch`.
 
     Args:
@@ -93,12 +102,15 @@ def call_push(git_dir: str, cur_branch: str) -> bool:
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
     )
-    _, error = push_output.communicate()
+    output, error = push_output.communicate()
 
-    # print(f"{output=}")
-    # print(f"{error=}")
+    print(f"{output=}")
+    print(f"{error=}")
+    error = error.decode("utf-8")
+    if "push declined due to repository rule violations" in error:
+        return PushStatus.REPO_VIOLATION
 
-    if "git push --set-upstream origin" in error.decode("utf-8"):
+    if "git push --set-upstream origin" in error:
         push_output = subprocess.Popen(
             f"git push -u origin {cur_branch}".split(" "),
             cwd=git_dir,
@@ -108,7 +120,7 @@ def call_push(git_dir: str, cur_branch: str) -> bool:
         _, error = push_output.communicate()
         # print(f"{output=}")
         # print(f"{error=}")
-    return True
+    return PushStatus.SUCCESSFUL
 
 
 def call_pull(git_dir, cur_branch) -> tuple[str, str]:

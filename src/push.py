@@ -2,6 +2,7 @@ import os.path
 
 from .pretty_print import failure, success
 from .utils import (
+    PushStatus,
     call_add_all,
     call_commit,
     call_commit_modified,
@@ -97,14 +98,14 @@ def report_push(
         pass_file_display_text = success(f"{git_name}") + f"<{cur_branch}> "
         commit_output = ""
 
-    successful = call_push(git_dir, cur_branch)
+    push_status = call_push(git_dir, cur_branch)
 
     fail_file_display_text = failure(f"{git_name}") + f"<{cur_branch}>{failure('->')} "
 
     fail_print_text = f"{git_dir.replace(home_path, '~')}: {fail_file_display_text}"
     pass_print_text = f"{git_dir.replace(home_path, '~')}: {pass_file_display_text}"
 
-    if successful:
+    if push_status == PushStatus.SUCCESSFUL:
         if commit_output:
             pass_print_text += (
                 commit_output.replace("+", success("+"))
@@ -112,17 +113,21 @@ def report_push(
                 .strip()
             )
         print_text = pass_print_text
+    elif push_status == PushStatus.REPO_VIOLATION:
+        fail_print_text += f"{failure('R')}epository Rule Violation"
+        print_text = fail_print_text
+
     else:
         fail_print_text += f"{failure('A')}borting"
         print_text = fail_print_text
 
     print(print_text)
 
-    if not silent and successful:
+    if not silent and push_status == PushStatus.SUCCESSFUL:
         for file in files:
             if file.startswith("M"):
                 print("  -", file)
             if file.startswith("?") and push_all:
                 print("  -", file)
 
-    return int(not successful)
+    return int(not push_status == PushStatus.SUCCESSFUL)
