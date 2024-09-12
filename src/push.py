@@ -114,11 +114,11 @@ def report_push(
             )
         print_text = pass_print_text
     elif push_status == PushStatus.REPO_VIOLATION:
-        fail_print_text += f"{failure('Repository Rule Violation')}"
+        fail_print_text += failure("Repository Rule Violation")
         print_text = fail_print_text
 
     else:
-        fail_print_text += f"{failure('A')}borting"
+        fail_print_text += failure("Aborting")
         print_text = fail_print_text
 
     print(print_text)

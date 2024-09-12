@@ -51,7 +51,7 @@ def report_pull(git_dir: str, git_name: str, silent: bool, verbose: bool) -> int
         return 0
 
     if num_behind == -1:
-        fail_print_text += f"{failure('Remote Branch Not Found')}"
+        fail_print_text += failure("Remote Branch Not Found")
         print(fail_print_text)
         return 1
 
@@ -71,7 +71,6 @@ def report_pull(git_dir: str, git_name: str, silent: bool, verbose: bool) -> int
     print(text)
 
     if not silent:
-
         if not successful:
             print(f"  {summary}")
         else:

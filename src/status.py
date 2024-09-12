@@ -8,6 +8,7 @@ def report_status(
     git_dir: str,
     git_name: str,
     silent: bool,
+    verbose: bool,
     untracked: bool,
     modified: bool,
     commit_diffs: bool,
@@ -18,6 +19,7 @@ def report_status(
         git_dir: The directory where the local repo is.
         git_name: The name of the folder containing the github repository.
         silent: Whether to remove details from output.
+        verbose: Whether to print for directories unaffected by the command.
         untracked: Whether to only report untracked files.
         modified: Whether to only report modified files.
         commit_diffs: Whether to check how many commits a local repo is ahead and behind the origin.
@@ -48,7 +50,7 @@ def report_status(
         or (untracked_count == 0 and untracked and not modified)
     )
     if (num_ahead, num_behind) == (0, 0) and no_files:
-        if not silent:
+        if not silent and verbose:
             print(
                 f"{git_dir.replace(home_path, '~')}: {success(git_name)}<{cur_branch}>"
             )
@@ -69,17 +71,17 @@ def report_status(
         return 0
 
     if modified_count > 0 and modified:
-        print_text += f"{failure('M')}odified:{failure(str(modified_count))} "
+        print_text += failure("Modified:" + str(modified_count))
     if untracked_count > 0 and untracked:
-        print_text += f"{failure('U')}ntracked:{failure(str(untracked_count))} "
+        print_text += failure("Untracked:" + str(untracked_count))
 
     if num_behind == -1 or num_ahead == -1:
-        print_text += f"{failure('Remote Branch Not Found')}"
+        print_text += failure("Remote Branch Not Found")
     else:
         if num_ahead > 0:
-            print_text += f"{failure('A')}head:{failure(str(num_ahead))} "
+            print_text += failure("Ahead:" + str(num_ahead))
         if num_behind > 0:
-            print_text += f"{failure('B')}ehind:{failure(str(num_behind))}"
+            print_text += failure("Behind:" + str(num_behind))
 
     print(print_text)
 

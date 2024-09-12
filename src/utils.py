@@ -337,7 +337,7 @@ def find_dirs_from_repo_names(
     Returns a list of pairs of folder names and directories of where the repositories are.
     """
     dirs = valid_git_dirs[:]
-    dirs.sort(key=lambda git_dir: os.path.basename(git_dir).lower())
+    dirs.sort(key=lambda git_dir: os.path.basename(git_dir))
     gits = []
 
     for name in set(repo_names):
@@ -347,12 +347,12 @@ def find_dirs_from_repo_names(
         found = True
         iterCount = 0
 
-        while name.lower() != os.path.basename(dirs[mid]).lower():
+        while name != os.path.basename(dirs[mid]):
             if high == mid == low or iterCount > len(dirs):
                 found = False
                 break
 
-            if name.lower() > os.path.basename(dirs[mid]).lower():
+            if name > os.path.basename(dirs[mid]):
                 low = mid + 1
             else:
                 high = mid - 1
@@ -396,6 +396,40 @@ def get_valid_git_dirs(exclude: list[str], exclude_dirs: list[str]) -> list[str]
         for git_dir in all_git_dirs
         if os.path.basename(git_dir) not in exclude
         and not any(
+            direc in git_dir.replace(os.path.expanduser("~"), "~")
+            for direc in exclude_dirs
+        )
+    ]
+
+
+def get_excluded_git_dirs(exclude: list[str], exclude_dirs: list[str]) -> list[str]:
+    """Gets all the directories containing github repositories that would be excluded with the
+    --exclude-dirs flag or environment variables.
+
+    Args:
+        exclude: List of the github repo names to exclude.
+        exclude_dirs: List of the directories containing github repositories to ignore.
+
+    Returns all the directories containing github repositories after applying exclusion.
+    """
+    root_dir = os.path.expanduser("~")
+    git_dirs = subprocess.check_output(
+        ["find", ".", "-name", ".git"],
+        text=True,
+        cwd=root_dir,
+    ).split("\n")
+
+    all_git_dirs = [
+        os.path.abspath(os.path.dirname(root_dir + git_dir[1:]))
+        for git_dir in git_dirs
+        if git_dir
+    ]
+
+    return [
+        git_dir
+        for git_dir in all_git_dirs
+        if os.path.basename(git_dir) in exclude
+        or any(
             direc in git_dir.replace(os.path.expanduser("~"), "~")
             for direc in exclude_dirs
         )
