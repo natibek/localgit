@@ -73,6 +73,7 @@ def report_push(
             else ""
         )
 
+        print("here")
         if push_all:
             call_add_all(git_dir)
             commit_output = call_commit(
