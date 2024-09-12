@@ -2,7 +2,9 @@ import setuptools
 
 from src._version import __version__
 
-description = "localgit is a tool for managing local git repo clones."
+description = (
+    "localgit is a CL tool for managing multiple local git repo clones simultaneously."
+)
 
 setuptools.setup(
     name="localgit",
