@@ -98,6 +98,6 @@ def report_status(
                 print("  -", file)
             if untracked and file.startswith("?"):
                 print("  -", file)
-            if untracked and file.startswith("D"):
+            if deleted and file.startswith("D"):
                 print("  -", file)
     return 1
