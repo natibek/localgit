@@ -67,7 +67,6 @@ def run_status(args, gits: list[tuple[str, str]]):
     if exit_code == 0:
         print(success("Repos are uptodate."))
 
-    print()
     return exit_code
 
 
@@ -92,7 +91,6 @@ def run_pull(args, gits: list[tuple[str, str]]) -> int:
 
     if exit_code == 0:  # use an enum?
         print(success("Repos are uptodate."))
-    print()
 
     return exit_code
 
@@ -115,11 +113,20 @@ def run_push(args, gits: list[tuple[str, str]]) -> int:
 
     if exit_code == 0:
         print(success("Repos are uptodate."))
-    print()
     return exit_code
 
 
 def run_list(gits: list[tuple[str, str]], excluded_gits: list[tuple[str, str]]) -> int:
+    """Runs the `localGits list` command.
+
+    Args:
+        gits: List of pairs of the folder names and directories of where the local repositories
+            that will not be ignored are.
+        excluded_gits: List of pairs of the folder names and directories of where the local
+            repositories that will be ignored are.
+
+    Returns exit codes 0 (if there are directories to be listed) or 1 (otherwise).
+    """
     if len(gits) == 0 and len(excluded_gits) == 0:
         print(warning("No local github repos found."))
         return 1
@@ -132,7 +139,6 @@ def run_list(gits: list[tuple[str, str]], excluded_gits: list[tuple[str, str]]) 
 
     for git_name, git_dir in excluded_gits:
         report_list(git_dir, git_name, True)
-    print()
 
     return 0
 
