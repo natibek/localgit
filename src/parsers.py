@@ -76,7 +76,7 @@ def setup_status_subparser(
     subparsers: argparse._SubParsersAction, run_status: Callable[[Any], int]
 ):
     """Setups up the `localgit status` subparser with the common arguments and status specific arguments
-    including --modified, --untracked, --commit-diff."""
+    including --modified, --untracked, --deleted, --commit-diffs."""
     status_parser = subparsers.add_parser(
         "status", help="Show the status of local repos."
     )
@@ -92,6 +92,11 @@ def setup_status_subparser(
         "--untracked",
         action="store_true",
         help="Whether to only check for untracked files.",
+    )
+    file_type.add_argument(
+        "--deleted",
+        action="store_true",
+        help="Whether to only check for deleted files.",
     )
     status_parser.add_argument(
         "--commit-diffs",

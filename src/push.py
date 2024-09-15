@@ -58,6 +58,7 @@ def report_push(
 
         has_modified = any(file.startswith("M") for file in files)
         has_untracked = any(file.startswith("?") for file in files)
+        has_deleted = any(file.startswith("D") for file in files)
 
         modified_message = (
             "Modified "
@@ -73,14 +74,23 @@ def report_push(
             if has_untracked and not message
             else ""
         )
+        deleted_message = (
+            "Deleted "
+            + ", ".join(file[2:] for file in files if file.startswith("D"))
+            + ". "
+            if has_deleted and not message
+            else ""
+        )
 
         if push_all:
             call_add_all(git_dir)
             commit_output = call_commit(
-                git_dir, message or (modified_message + added_message).strip()
+                git_dir, message or (modified_message + added_message + deleted_message)
             )
-        elif has_modified:
-            commit_output = call_commit_modified(git_dir, message or modified_message)
+        elif has_modified or has_deleted:
+            commit_output = call_commit_modified(
+                git_dir, message or (modified_message + deleted_message)
+            )
         elif not silent and verbose:
             print(
                 f"{git_dir.replace(home_path, '~')}: "
@@ -126,6 +136,8 @@ def report_push(
     if not silent and push_status == PushStatus.SUCCESSFUL:
         for file in files:
             if file.startswith("M"):
+                print("  -", file)
+            if file.startswith("D"):
                 print("  -", file)
             if file.startswith("?") and push_all:
                 print("  -", file)
