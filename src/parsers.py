@@ -82,6 +82,11 @@ def setup_status_subparser(
     )
     add_common_args(status_parser)
     status_parser.set_defaults(func=run_status)
+    status_parser.add_argument(
+        "--commit-diffs",
+        action="store_true",
+        help="Whether to check how many commits a local repo is ahead and behind the origin.",
+    )
     file_type = status_parser.add_mutually_exclusive_group()
     file_type.add_argument(
         "--modified",
@@ -97,11 +102,6 @@ def setup_status_subparser(
         "--deleted",
         action="store_true",
         help="Whether to only check for deleted files.",
-    )
-    status_parser.add_argument(
-        "--commit-diffs",
-        action="store_true",
-        help="Whether to check how many commits a local repo is ahead and behind the origin.",
     )
 
 

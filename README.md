@@ -35,6 +35,7 @@ Has the following arguments:
 
 1. `--modified`: Only check for modified files. \~
 1. `--untracked`: Only check for untracked files. \~
+1. `--deleted`: Only check for deleted files. \~
 1. `--commit-diffs`: Check how many commits ahead and behind the origin the local repo clone is. \*
 
 _\~ Arguments are mutually exclusive._

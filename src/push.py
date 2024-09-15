@@ -61,7 +61,7 @@ def report_push(
         has_deleted = any(file.startswith("D") for file in files)
 
         modified_message = (
-            "Modified "
+            "Updated "
             + ", ".join(file[2:] for file in files if file.startswith("M"))
             + ". "
             if has_modified and not message
