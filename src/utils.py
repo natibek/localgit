@@ -37,25 +37,7 @@ def get_commit_logs(git_dir: str, num_logs: int) -> list[str]:
     return logs[: min(len(logs), num_logs)]
 
 
-def call_commit_modified(git_dir: str, message: str) -> str:
-    """Call `git commit -am ` with a message.
-
-    Args:
-        git_dir: The github directory where the command will be run.
-        message: The commit message.
-
-    Returns:
-        The text output from the command.
-    """
-    commit_output = subprocess.check_output(
-        ["git", "commit", "-am", message],
-        cwd=git_dir,
-        text=True,
-    ).split("\n")
-    return commit_output[1].strip()
-
-
-def call_commit(git_dir: str, message: str = "update") -> str:
+def call_commit(git_dir: str, message: str, tracked: bool = False) -> str | None:
     """Call `git commit -m ` with a message.
 
     Args:
@@ -63,15 +45,25 @@ def call_commit(git_dir: str, message: str = "update") -> str:
         message: The commit message.
 
     Returns:
-        The text output from the command.
+        The text output from the command or None if commit failed.
     """
-    commit_output = subprocess.check_output(
-        ["git", "commit", "-m", message],
-        cwd=git_dir,
-        text=True,
-    ).split("\n")
+    if tracked: option = "-am"
+    else: option = "-m"
 
-    return commit_output[1].strip()
+    output = subprocess.Popen(
+        ["git", "commit", option, message],
+        cwd=git_dir,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+
+    commit_output, error = output.communicate()
+
+    if error:
+        return None
+
+    commit_output = commit_output.decode().split("\n")[1].strip()
+    return commit_output
 
 
 def call_add_all(git_dir: str) -> None:
@@ -297,21 +289,26 @@ def get_unpushed_files(git_dir: str) -> list[str]:
     return [file.strip() for file in files if file]
 
 
-def get_cur_branch(git_dir) -> str:
+def get_cur_branch(git_dir) -> str | None:
     """Gets the current branch the local repo is checkout into.
 
     Args:
         git_dir: The github directory where the command will be run.
 
     Returns:
-        The name of the current branch.
+        The name of the current branch or None if there was an error.
     """
-    cur_branch = subprocess.check_output(
+    fetch = subprocess.Popen(
         ["git", "branch", "--show-current"],
-        text=True,
         cwd=git_dir,
-    )[:-1]
-    return cur_branch
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    output, error = fetch.communicate()
+    if error.decode("utf-8"):
+        return None
+
+    return output.decode()[:-1]
 
 
 def get_git_names(git_dirs: list[str]) -> list[str]:

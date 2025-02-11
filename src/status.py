@@ -31,7 +31,7 @@ def report_status(
 
     cur_branch = get_cur_branch(git_dir)
 
-    if not cur_branch:
+    if cur_branch is None:
         return 0
 
     num_ahead, num_behind = (
@@ -70,25 +70,25 @@ def report_status(
         or num_behind > 0
         or num_behind == -1
     ):
-        file_display_text = failure(f"{git_name}") + f"<{cur_branch}>" + failure("-> ")
+        file_display_text = failure(f"{git_name}") + f"<{cur_branch}>" + failure("->")
         print_text = f"{git_dir.replace(home_path, '~')}: {file_display_text}"
     else:
         return 0
 
     if modified_count > 0 and modified:
-        print_text += failure("Modified:" + str(modified_count))
+        print_text += failure(" Modified:" + str(modified_count))
     if untracked_count > 0 and untracked:
-        print_text += failure("Untracked:" + str(untracked_count))
+        print_text += failure(" Untracked:" + str(untracked_count))
     if deleted_count > 0 and deleted:
-        print_text += failure("Deleted:" + str(deleted_count))
+        print_text += failure(" Deleted:" + str(deleted_count))
 
     if num_behind == -1 or num_ahead == -1:
-        print_text += failure("Remote Branch Not Found")
+        print_text += failure(" Remote Branch Not Found")
     else:
         if num_ahead > 0:
-            print_text += failure("Ahead:" + str(num_ahead))
+            print_text += failure(" Ahead:" + str(num_ahead))
         if num_behind > 0:
-            print_text += failure("Behind:" + str(num_behind))
+            print_text += failure(" Behind:" + str(num_behind))
 
     print(print_text)
 

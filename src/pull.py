@@ -24,8 +24,9 @@ def report_pull(git_dir: str, git_name: str, silent: bool, verbose: bool) -> int
     """
 
     cur_branch = get_cur_branch(git_dir)
-    if not cur_branch:
+    if cur_branch is None:
         return 0
+
     num_behind = num_commits_behind(git_dir, cur_branch)
     home_path = os.path.expanduser("~")
 
@@ -51,7 +52,7 @@ def report_pull(git_dir: str, git_name: str, silent: bool, verbose: bool) -> int
         return 0
 
     if num_behind == -1:
-        fail_print_text += failure("Remote Branch Not Found")
+        fail_print_text += failure(" Remote Branch Not Found")
         print(fail_print_text)
         return 1
 
@@ -64,9 +65,9 @@ def report_pull(git_dir: str, git_name: str, silent: bool, verbose: bool) -> int
         if len(summary) > 0:
             text += summary + " "
         if len(failed_merge) > 0:
-            text += warning("Merge Conflict")
+            text += warning(" Merge Conflict")
     else:
-        fail_print_text += failure("Error")
+        fail_print_text += failure(" Error")
 
     print(text)
 

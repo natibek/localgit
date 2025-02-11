@@ -14,8 +14,11 @@ def report_log(git_dir: str, git_name: str, num_logs: int) -> int:
 
     Returns exit codes 0 or 1.
     """
-    logs = get_commit_logs(git_dir, num_logs)
     cur_branch = get_cur_branch(git_dir)
+    if cur_branch is None:
+        return 0
+
+    logs = get_commit_logs(git_dir, num_logs)
 
     home_path = os.path.expanduser("~")
 

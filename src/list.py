@@ -18,6 +18,8 @@ def report_list(
     """
 
     cur_branch = get_cur_branch(git_dir)
+    if cur_branch is None:
+        return 0
 
     branch_text = f"<{cur_branch}>" if cur_branch else ""
     home_path = os.path.expanduser("~")
