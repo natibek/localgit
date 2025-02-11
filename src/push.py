@@ -51,7 +51,7 @@ def report_push(
 
     if len(files) > 0:
         pass_file_display_text = (
-            success(f"{git_name}") + f"<{cur_branch}>{success('->')}"
+            success(f"{git_name}") + f"<{cur_branch}>{success('-> ')}"
         )
 
         has_modified = any(file.startswith("M") for file in files)
@@ -117,7 +117,7 @@ def report_push(
 
     push_status = call_push(git_dir, cur_branch)
 
-    fail_file_display_text = failure(f"{git_name}") + f"<{cur_branch}>{failure('->')} "
+    fail_file_display_text = failure(f"{git_name}") + f"<{cur_branch}>{failure('-> ')} "
 
     fail_print_text = f"{git_dir.replace(home_path, '~')}: {fail_file_display_text}"
     pass_print_text = f"{git_dir.replace(home_path, '~')}: {pass_file_display_text}"
